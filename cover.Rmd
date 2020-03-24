@@ -1,0 +1,17 @@
+---
+title:   
+output: 
+  html_document:
+    css: background.css
+---
+
+<br><br>
+
+<h2 style = "color:white; text-align:center; background-color: black;"> Lemon Juice Classification with Machine Learning</h1>
+
+
+<br><br>
+
+<p style = "color: white; text-align:center; font-size: 120%;"> Welcome to visit <strong>[our laboratory.](http://newuseag.rutgers.edu/)</strong> </p> 
+
+<br>

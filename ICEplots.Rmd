@@ -1,0 +1,430 @@
+---
+title: "Individual conditional expectation plots"
+date: "3/23/2020"
+output: html_document
+    
+---
+
+```{r, message=F, warning=F, results='hide', echo=F}
+# Basic setup
+library(readxl)
+library(rebus)
+library(stringr)
+library(ggrepel)
+library(gridExtra)
+library(cowplot)
+library(RColorBrewer)
+library(viridis)
+library(ggcorrplot)
+library(ggsci)
+library(plotly)
+
+
+# machine learning packages
+library(glmnet)
+library(MASS)
+library(e1071)
+library(rsample)
+library(randomForest)
+
+# finally load tidyverse avoiding key functions from being masked
+library(tidyverse)
+```
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+set.seed(1)
+
+theme_set(theme_bw() +
+            theme(strip.background = element_blank(),
+                  strip.text = element_text(face = "bold", size = 11),
+                  legend.text = element_text(size = 10),
+                  legend.title = element_blank(),
+                  axis.text = element_text(size = 11, colour = "black"),
+                  title = element_text(colour = "black", face = "bold"),
+                  axis.title = element_text(size = 12))) 
+
+# global color set
+color.types = c("firebrick", "steelblue", "darkgreen")
+names(color.types) = c("adulterated", "authentic", "commercial")
+```
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+# Raw data tidy up
+path = "/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/lemon final data_March21.xlsx"
+d = read_excel(path, sheet = "March")
+
+
+# Replace special values
+vectorReplace = function(x, searchPattern){
+  
+  replaceWith = NA
+  
+  if (searchPattern == "T.") {
+    # arbitrarily replace Trace level as one fifth of the minimum
+    replaceWith = ((as.numeric(x) %>% min(na.rm = T)) / 5) %>% as.character()
+  } else if (searchPattern == "n.d.") {
+    # arbitrarily set non-detected level as content being zero
+    replaceWith = "0"
+  } else if (searchPattern == "LOD") {
+    # for content whose UV absorption beyond instrument limit, set as double of the maximum value 
+    replaceWith = ((as.numeric(x) %>% max(na.rm = T)) * 2) %>% as.character()
+  }
+  
+  
+  if (is.na(replaceWith)) { return(x) } else { # only performnce replacement when with special values
+    x = str_replace_all(x, pattern = searchPattern, replacement = replaceWith)
+    return(x)
+  }
+}
+
+
+d = apply(d, 2, vectorReplace, searchPattern = "T.")
+d = apply(d, 2, vectorReplace, searchPattern = "n.d.")
+d = apply(d, 2, vectorReplace, searchPattern = "LOD") %>% as_tibble()
+
+d = cbind(d[, c(1:4)], # sample id information
+          apply(d[, -c(1:4)], 2, as.numeric)) %>% # content in numeric values
+  as_tibble()
+```
+
+
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+# Machine learning
+## Training & cross validation & testing
+### Training set
+
+# Data preparation
+colnames(d) = colnames(d) %>% make.names() # ensure column names are suitable for ML 
+d$type = d$type %>% as.factor()
+
+trainTest.split = d %>% initial_split(strata = "type", prop = .7, sed)
+
+# training set
+trainingSet.copy = training(trainTest.split) # as a copy of the training set
+
+trainingSet = trainingSet.copy %>% select(-c(code, Sample, character)) # for machine learning training
+trainingSet.scaled = trainingSet[, -1] %>% scale() %>% as_tibble() %>% # normalized data
+  mutate(type = trainingSet$type) %>% # add type
+  select(ncol(trainingSet), 1:(ncol(trainingSet)-1)) # put type as first column
+
+# mean and standard deviation of each feature, for normalization of the test set
+mean.vector = trainingSet[, -1] %>% apply(2, mean)
+sd.vector = trainingSet[, -1] %>% apply(2, sd)
+```
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+### Testing set
+
+
+# testing set, normalized based on mean and standard deviation of the training set
+testingSet.copy = testing(trainTest.split) # as a copy of the testing set with additional sample info
+
+testingSet = testingSet.copy %>% select(-c(code, Sample, character))
+testingSet.scaled = testingSet %>% select(-type) %>% scale(center = mean.vector, scale = sd.vector) %>%
+  as_tibble() %>% mutate(type = testingSet$type) %>% # add actual type of the test set
+  select(ncol(testingSet), 1:(ncol(testingSet)-1)) # put type as first column
+```
+
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+### Cross-validation (CV) folds
+
+# CV-fold of the training set, for hyperparameter tune & model performance comparison
+trainingSet.cv = trainingSet %>% 
+  vfold_cv(v = 5) %>%
+  mutate(train = map(.x = splits, .f = ~training(.x)),
+         validate = map(.x = splits, .f = ~testing(.x)))
+
+# scale training and validation fold (based on the corresponding training fold)
+trainingSet.cv.scaled = trainingSet.cv %>%
+  mutate(train.mean = map(.x = train, .f = ~ apply(.x[, -1], 2, mean)),
+         train.sd = map(.x =  train, .f = ~ apply(.x[, -1], 2, sd)),
+         # wrap mean and std into a list: 1st mean; 2nd std (or instead use pmap function for succinct coding)
+         train.mean.sd = map2(.x = train.mean, .y = train.sd, .f = ~list(.x, .y)), 
+         
+         # normalize training; note type as the last column 
+         train.scaled = map(.x = train, .f = ~ .x[, -1] %>% scale() %>% as_tibble() %>% mutate(type = .x$type) ),
+         # normalize validation fold based corresponding training fold; note type as the last column
+         validate.scaled = map2(.x = validate, .y = train.mean.sd,
+                                .f = ~ .x[, -1] %>% scale(center = .y[[1]], scale = .y[[2]]) %>% as_tibble() %>% mutate(type = .x$type) ),
+         # actual validation result
+         validate.actual = map(.x = validate.scaled, .f = ~.x$type)
+  ) %>%
+  select(-c(train, validate, train.mean, train.sd, splits))
+
+trainingSet.cv.scaled
+```
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+## Support vector machine (SVM)
+mdl.svm = svm(data = trainingSet.scaled, type ~., 
+              # gamma = d.tune.svm.radial$gamma[1], cost = d.tune.svm.radial$cost[1],
+              kernel = "radial", type = "C-classification")
+```
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+## Linear discriminant analysis (LDA)
+mdl.lda = lda(data = trainingSet.scaled, type ~., prior = rep(1/3, 3))
+
+```
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+## Random forest
+mdl.rf = randomForest(data = trainingSet.scaled, type ~., num.trees = 900, mtry = 2)
+```
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+## Naive Bayes
+mdl.nb = naiveBayes(x = trainingSet.scaled[, -1], 
+                    y = trainingSet.scaled$type %>% as.factor(), # y has to be factor 
+                    prior = c(1/3, 1/3, 1/3)) 
+```
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+## logistic (softmax) regression
+softmax.cv = cv.glmnet(x = trainingSet.scaled[, -1] %>% as.matrix(), 
+                       y = trainingSet.scaled$type, family = "multinomial", alpha = 1)
+# Prediction on the training set
+fitted.softmax.train = predict(softmax.cv, newx = trainingSet.scaled[, -1] %>% as.matrix(),
+                               s = softmax.cv$lambda.1se, type = "class") %>% c()
+```
+
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+# Model interpretation
+## Random forest
+func.plot.ICE.RF = function(feature) {
+  
+  lowerBound = trainingSet.scaled[[feature]] %>% min() 
+  upperBound = trainingSet.scaled[[feature]] %>% max() 
+  
+  ICE = trainingSet.scaled %>% 
+    mutate(instance = 1:nrow(trainingSet.scaled)) # unique instance code for each training example
+  ICE = ICE %>% select(ncol(ICE), 1:(ncol(ICE)-1))
+  
+  ICE.grid = expand.grid(instance = ICE$instance, 
+                         grid = seq(lowerBound, upperBound, length.out = 100)) %>%
+    left_join(ICE, by = "instance") %>% as_tibble() %>%
+    rename(actual.type = type)
+  
+  
+  # update feature of interest without changing feature column order
+  ICE.grid[[feature]] = ICE.grid$grid 
+  feature.grid = ICE.grid %>% select(-c(grid, instance))
+  
+  # Random forest
+  ICE.fitted = predict(mdl.rf, newdata = feature.grid, type = "prob")  %>% as_tibble()
+  
+  
+  # Individual instance
+  ICE.fitted.tidy = ICE.fitted %>% as_tibble() %>%
+    mutate(instance = ICE.grid$instance, grid = ICE.grid$grid, actual.type = ICE.grid$actual.type,
+           instance = as.numeric(instance)) %>%
+    gather(1:3, key = predicted.type, value = fitted.prob) 
+  
+  # the overal trend
+  ICE.fitted.tidy.OVERAL = ICE.fitted.tidy %>%
+    group_by(actual.type, predicted.type, grid) %>%
+    summarise(fitted.prob = mean(fitted.prob))
+  
+  # plot
+  plt.ICE = 
+    
+    ICE.fitted.tidy %>%
+    ggplot(aes(x = grid, y = fitted.prob, color = actual.type)) +
+    geom_line(aes(group = instance), alpha = .3) +
+    facet_wrap(~predicted.type, nrow = 1) +
+    labs(caption = "color by actual type, faceted by predicted type") +
+    scale_color_brewer(palette = "Set1") +
+    labs(title = " Random forest", 
+         x = "Standard deviation grids",
+         y = "Predicted probability for each class") +
+    
+    # overal trend as top layer
+    geom_line(data = ICE.fitted.tidy.OVERAL, size = 2) +
+    
+    # rug
+    geom_rug(data = trainingSet.scaled, aes_string(x = feature), 
+             inherit.aes = F, alpha = .3) +
+    
+    coord_cartesian(xlim = c(lowerBound, 2)) +
+    scale_y_continuous(breaks = seq(0, 1, by = .2))
+  # Turning point usually much ealier than grid sd 2. 
+  # a further manual adjustment than automatic range selection set by "upperBound"
+  
+  plt.ICE %>% return()
+}
+```
+
+
+```{r, message=F, warning=F, results='hide', echo=F}
+## logistic (softmax) regression 
+
+
+
+func.plot.ICE.logistic = function(feature) {
+  
+  lowerBound = trainingSet.scaled[[feature]] %>% min() 
+  upperBound = trainingSet.scaled[[feature]] %>% max() 
+  
+  ICE = trainingSet.scaled %>% 
+    mutate(instance = 1:nrow(trainingSet.scaled)) # unique instance code for each training example
+  ICE = ICE %>% select(ncol(ICE), 1:(ncol(ICE)-1))
+  
+  ICE.grid = expand.grid(instance = ICE$instance, 
+                         grid = seq(lowerBound, upperBound, length.out = 100)) %>%
+    left_join(ICE, by = "instance") %>% as_tibble() %>%
+    rename(actual.type = type)
+  
+  
+  # update feature of interest without changing feature column order
+  ICE.grid[[feature]] = ICE.grid$grid 
+  feature.grid = ICE.grid %>% select(-c(grid, instance))
+  
+  # logistic regression
+  ICE.fitted = predict(softmax.cv, newx = feature.grid[, -1] %>% as.matrix(),
+                       s = softmax.cv$lambda.1se,, type = "response") %>%
+    as.tibble() %>%
+    rename(adulterated = adulterated.1, authentic = authentic.1, commercial = commercial.1)
+  
+  
+  # Individual instance
+  ICE.fitted.tidy = ICE.fitted %>% as_tibble() %>%
+    mutate(instance = ICE.grid$instance, grid = ICE.grid$grid, actual.type = ICE.grid$actual.type,
+           instance = as.numeric(instance)) %>%
+    gather(1:3, key = predicted.type, value = fitted.prob) 
+  
+  # the overal trend
+  ICE.fitted.tidy.OVERAL = ICE.fitted.tidy %>%
+    group_by(actual.type, predicted.type, grid) %>%
+    summarise(fitted.prob = mean(fitted.prob))
+  
+  # plot
+  plt.ICE = 
+    
+    ICE.fitted.tidy %>%
+    ggplot(aes(x = grid, y = fitted.prob, color = actual.type)) +
+    geom_line(aes(group = instance), alpha = .3) +
+    facet_wrap(~predicted.type, nrow = 1) +
+    scale_color_brewer(palette = "Set1") +
+    labs(title = "logistic regression (lasso)", 
+         x = "Standard deviation grids", 
+         y = "Predicted probability for each class",
+         caption = "color by actual type, faceted by predicted type") +
+    
+    # overal trend as top layer
+    geom_line(data = ICE.fitted.tidy.OVERAL, size = 2) +
+    
+    # rug
+    geom_rug(data = trainingSet.scaled, aes_string(x = feature), 
+             inherit.aes = F, alpha = .3) +
+    
+    coord_cartesian(xlim = c(lowerBound, 2)) +
+    scale_y_continuous(breaks = seq(0, 1, by = .2))
+  # Turning point usually much ealier than grid sd 2. 
+  # a further manual adjustment than automatic range selection set by "upperBound"
+  
+  plt.ICE %>% return()
+}
+```
+
+
+**The plotting iterates through all features.** 
+
+```{r, message=F, warning=F, results='hide', echo=F}
+## Visualization
+
+lemonFeatures = colnames(trainingSet)[-1]
+
+# Model interpretation comparison: RF vs. LR
+func.plt.ICE.modelComparison.distribution = function(featureCode = 1){
+  
+  plt.ICE.citric.acid.logistic = func.plot.ICE.logistic(feature = lemonFeatures[featureCode])
+  plt.ICE.citric.acid.randomForest = func.plot.ICE.RF(feature = lemonFeatures[featureCode])
+  
+  
+  plot_grid(plt.ICE.citric.acid.logistic, 
+            plt.ICE.citric.acid.randomForest, 
+            
+            # distribution
+            plot_grid(
+              # authentic vs. adulterated
+              d %>% 
+                filter(type != "commercial") %>%
+                ggplot(aes_string(x = lemonFeatures[featureCode], fill = "type", color = "type")) +
+                geom_density(alpha = .2, position = "dodge") +
+                scale_color_manual(values = color.types) +
+                scale_fill_manual(values = color.types) +
+                theme(legend.position = "none"), 
+              
+              # all three classes
+              d %>% 
+                ggplot(aes_string(x = lemonFeatures[featureCode], fill = "type", color = "type")) +
+                geom_density(alpha = .2, position = "dodge") +
+                scale_color_manual(values = color.types) +
+                scale_fill_manual(values = color.types), 
+              
+              # layout
+              nrow = 1, rel_widths = c(4, 5) ),
+            
+            nrow = 3, rel_heights = c(1, 1, .7), labels = c("A", "B", "C"), label_size = 17
+  )
+}
+```
+
+
+```{r, message=F, warning=F, echo=F,  fig.height=12, fig.width=10}
+# Make sure the compound names present correctly and professionaly
+func.tidyFeatureNames = function(vector){
+  
+  vector = vector %>% str_replace(pattern = DOT, replacement = " ")
+  
+  if (vector == "X3 4.di.HBA") {return("3,4-diHBA")
+  } else if (vector == "X3 HBA") { return("3-HBA")
+  } else if (vector == "p Coumaric.acid") { return("p-Coumaric acid")
+  } else if (vector == "X4 HBA") {return("4-HBA")
+  } else if (vector == "glucose fructose") { return("Glucose & Fructose")
+  }
+  
+  return(vector)
+}
+```
+
+
+```{r, message=F, warning=F, echo=F,  fig.height=12, fig.width=10}
+for(i in 1:length(lemonFeatures)){
+  
+  # Feature title
+  title_theme = ggplot() + 
+    geom_text(aes(x = .5, y = .5, 
+                  # due to standardized column names, compounds starting with numbers e.g. 3-HBA will start with X
+                  # remove that X!
+                  label = lemonFeatures[i] %>% func.tidyFeatureNames()), 
+              fontface = "bold", size = 9) + 
+    theme_void() + theme(legend.position = "none")
+  
+  plt = func.plt.ICE.modelComparison.distribution(featureCode = i)
+  
+  space = ggplot() + theme_void()
+  
+  plot_grid(title_theme, plt, space, rel_heights = c(.5, 10, 2), nrow = 3) %>%
+    # print is needed to show the plot
+    print()
+  
+}
+
+
+```
+

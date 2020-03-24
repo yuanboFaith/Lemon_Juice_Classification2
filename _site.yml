@@ -1,0 +1,11 @@
+name: ""
+navbar:
+  title: ""
+  left:
+    - text: "Home"
+      href: cover.html
+    - text: "ICE plots"
+      href: ICEplots.html
+    - text: "R Script"
+      href: LemonMLscript.html
+output_dir: "."
