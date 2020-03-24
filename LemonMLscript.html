@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Lemon Juice Classification</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.1/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.49.4/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.49.4/plotly-latest.min.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="ICEplots.html">ICE plots</a>
+</li>
+<li>
+  <a href="LemonMLscript.html">R Script</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Lemon Juice Classification</h1>
+<h4 class="date">3/23/2020</h4>
+
+</div>
+
+
+<div id="basic-setup" class="section level1">
+<h1><span class="header-section-number">1</span> Basic setup</h1>
+<pre class="r"><code>library(readxl)
+library(rebus)
+library(stringr)
+library(ggrepel)
+library(gridExtra)
+library(cowplot)
+library(RColorBrewer)
+library(viridis)
+library(ggcorrplot)
+library(ggsci)
+library(plotly)
+
+
+# machine learning packages
+library(glmnet)
+library(MASS)
+library(e1071)
+library(rsample)
+library(randomForest)
+
+# finally load tidyverse avoiding key functions from being masked
+library(tidyverse)</code></pre>
+<pre class="r"><code>set.seed(1)
+
+theme_set(theme_bw() +
+            theme(strip.background = element_blank(),
+                  strip.text = element_text(face = &quot;bold&quot;, size = 11),
+                  legend.text = element_text(size = 10),
+                  legend.title = element_blank(),
+                  axis.text = element_text(size = 11, colour = &quot;black&quot;),
+                  title = element_text(colour = &quot;black&quot;, face = &quot;bold&quot;),
+                  axis.title = element_text(size = 12))) 
+
+# global color set
+color.types = c(&quot;firebrick&quot;, &quot;steelblue&quot;, &quot;darkgreen&quot;)
+names(color.types) = c(&quot;adulterated&quot;, &quot;authentic&quot;, &quot;commercial&quot;)</code></pre>
+</div>
+<div id="raw-data-tidy-up" class="section level1">
+<h1><span class="header-section-number">2</span> Raw data tidy up</h1>
+<pre class="r"><code>path = &quot;/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/lemon final data_March21.xlsx&quot;
+d = read_excel(path, sheet = &quot;March&quot;)
+
+
+# Replace special values
+vectorReplace = function(x, searchPattern){
+  
+  replaceWith = NA
+  
+  if (searchPattern == &quot;T.&quot;) {
+    # arbitrarily replace Trace level as one fifth of the minimum
+    replaceWith = ((as.numeric(x) %&gt;% min(na.rm = T)) / 5) %&gt;% as.character()
+  } else if (searchPattern == &quot;n.d.&quot;) {
+    # arbitrarily set non-detected level as content being zero
+    replaceWith = &quot;0&quot;
+  } else if (searchPattern == &quot;LOD&quot;) {
+    # for content whose UV absorption beyond instrument limit, set as double of the maximum value 
+    replaceWith = ((as.numeric(x) %&gt;% max(na.rm = T)) * 2) %&gt;% as.character()
+  }
+  
+  
+  if (is.na(replaceWith)) { return(x) } else { # only performnce replacement when with special values
+    x = str_replace_all(x, pattern = searchPattern, replacement = replaceWith)
+    return(x)
+  }
+}
+
+
+d = apply(d, 2, vectorReplace, searchPattern = &quot;T.&quot;)
+d = apply(d, 2, vectorReplace, searchPattern = &quot;n.d.&quot;)
+d = apply(d, 2, vectorReplace, searchPattern = &quot;LOD&quot;) %&gt;% as_tibble()
+
+d = cbind(d[, c(1:4)], # sample id information
+          apply(d[, -c(1:4)], 2, as.numeric)) %&gt;% # content in numeric values
+  as_tibble()</code></pre>
+</div>
+<div id="exploratory-data-analysis-eda" class="section level1">
+<h1><span class="header-section-number">3</span> Exploratory data analysis (EDA)</h1>
+<div id="distribution-plot" class="section level2">
+<h2><span class="header-section-number">3.1</span> Distribution plot</h2>
+<pre class="r"><code>plt.contentDistribution = d %&gt;% gather(-c(1:4), key = compounds, value = content) %&gt;%
+  ggplot(aes(x = content, fill = type, color = type)) +
+  geom_density(alpha = .2) +
+  facet_wrap(~compounds, scales = &quot;free&quot;, nrow = 3) +
+  theme(legend.position = c(.9, .15))
+plt.contentDistribution</code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
+</div>
+<div id="feature-correlation-plot" class="section level2">
+<h2><span class="header-section-number">3.2</span> feature correlation plot</h2>
+<pre class="r"><code>func.plotCorrelation = function(whichType, title){
+  d %&gt;% filter(type == whichType) %&gt;%
+    select(-c(1:4)) %&gt;% cor() %&gt;%
+    ggcorrplot(hc.order = T, method = &quot;circle&quot;, colors = c(&quot;Firebrick&quot;, &quot;white&quot;, &quot;Steelblue&quot;) %&gt;% rev()) +
+    coord_equal() + theme(axis.text = element_text(colour = &quot;black&quot;), title = element_text(face = &quot;bold&quot;))
+  
+}
+
+func.plotCorrelation(whichType = &quot;authentic&quot;) + ggtitle(&quot;Correlation matrix - Authentic juice&quot;)</code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>func.plotCorrelation(whichType = &quot;commercial&quot;) + ggtitle(&quot;Correlation matrix - Commercial products&quot;)</code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+</div>
+<div id="pca" class="section level2">
+<h2><span class="header-section-number">3.3</span> PCA</h2>
+<pre class="r"><code>mat.scaled = d %&gt;% select(-c(code, Sample, type, character)) %&gt;% scale()
+cov.matrix = cov(mat.scaled)
+eigens = eigen(cov.matrix) # eigenvectors and values of covariance matrix
+eigen.values = eigens$values
+eigen.vectorMatrix = eigens$vectors
+PC = mat.scaled %*% eigen.vectorMatrix # principle component matrix
+colnames(PC) = paste0(&quot;PC&quot;, 1:ncol(PC)) # add PC&#39;s as column names
+PC = d.PC = cbind(d[, 1:4], PC) %&gt;% as_tibble()
+
+PC %&gt;% ggplot(aes(x = PC1, y = PC2, color = type)) +
+  geom_point(position = position_jitter(.1, .1), shape = 21, fill = &quot;white&quot;) +
+  # geom_text(aes(label = code)) +
+  scale_color_startrek() +
+  labs(x = paste0(&quot;PC1, &quot;, round(eigen.values[1]/sum(eigen.values)* 100, 1), &quot;% explained&quot;),
+       y = paste0(&quot;PC2, &quot;, round(eigen.values[2]/sum(eigen.values)* 100, 1), &quot;% explained&quot;)) +
+  coord_equal()</code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-6-1.png" width="768" /></p>
+<pre class="r"><code># 3D PCA
+# link: https://rpubs.com/Boyuan/lemon_juice_3D_PCA
+plot_ly(PC, x = ~ PC1, y =  ~PC2, z =  ~PC3, color = ~ type) %&gt;%
+  add_markers() %&gt;%
+  layout(title = &#39;3D Interactive PCA&#39;,
+         scene = list(
+           xaxis = list(title = paste0(&quot;PC1, &quot;, round(eigen.values[1]/sum(eigen.values)* 100, 1), &quot;% explained&quot;)),
+           yaxis = list(title = paste0(&quot;PC2, &quot;, round(eigen.values[2]/sum(eigen.values)* 100, 1), &quot;% explained&quot;)),
+           zaxis = list(title = paste0(&quot;PC3, &quot;, round(eigen.values[3]/sum(eigen.values)* 100, 1), &quot;% explained&quot;))
+         )
+  )</code></pre>
+<div id="htmlwidget-5f92e833e5f1a9a10f34" style="width:768px;height:768px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5f92e833e5f1a9a10f34">{"x":{"visdat":{"149734a4228a0":["function () ","plotlyVisDat"]},"cur_data":"149734a4228a0","attrs":{"149734a4228a0":{"x":{},"y":{},"z":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Interactive PCA","scene":{"xaxis":{"title":"PC1, 35.9% explained"},"yaxis":{"title":"PC2, 14.8% explained"},"zaxis":{"title":"PC3, 9.6% explained"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[2.16937890399153,1.91040110116648,1.73221609775543,1.17409021885505,-0.152810861888566,-2.77565576208736,0.722499018998943,-1.20627984740878,-1.93122000073008,-3.1998142506024,-2.91048610751429,-4.3598441953108,-0.864027408055558,-1.74786060716305,-1.94252884556735,-2.67962802442246,-3.15358925372303,2.02343716994806,-1.81916021687553,0.495095010615543,1.98993932127347,-0.266874177285252,0.640533422479092,1.98227516919192,-0.936599633956021,1.21521316995854,2.20681874569683,-1.69776657154801,0.429424810637125,1.88438413892544,-1.04678675944628,1.21178294735348,1.87946551113415,0.304845543706161,1.25227816125772,1.68166045692548],"y":[-0.658848045149263,-0.570935788341447,0.279712723268497,1.03059252962476,1.19419472565614,-3.69838690851849,1.52890157579717,2.36787722609301,2.65702938898717,2.31350201956368,2.2228264387465,2.0984469015658,3.28138990409283,3.49790347290262,3.10247632700314,2.62100094475333,1.82881405309405,-0.702774095542958,-2.84528951732795,0.181301846302691,-0.369267954510674,-1.75912024221848,0.0103710592361301,-0.339145113195276,-2.34936387065743,-0.124719566772218,-0.742423392014647,-3.16939115449346,-0.630269315863172,-0.621821127154626,-2.4791872736323,-0.0431198866705049,-0.131770434248737,-1.21604297905936,0.0395814373344747,0.603866378701767],"z":[-2.34480231778391,-1.48772010112747,-0.0664154067536629,0.198808796095033,1.32445580763647,-3.98764175084739,-0.476686544791779,-1.18923304921537,-0.850817517476233,-1.49126982123039,-1.55104397965071,-0.76386539880732,-0.707437499175226,-0.77549451816468,-1.05114694936007,-1.47700866911456,-0.436445552207564,-2.42409139119584,0.0528611176700419,-0.284881992020533,-2.21011066538489,0.192731310880614,0.129791548327964,-1.88150157195009,-0.232949319195479,0.79270784099746,-2.44483742830136,0.131294520704453,0.983512416012826,-1.3330038314345,0.0152601375277107,-0.0244703954086118,-1.76321272916386,-0.100619894487396,0.619932313614336,-0.0725424907837826],"type":"scatter3d","mode":"markers","name":"adulterated","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[1.01291888861507,0.467017620477701,1.08770193971381,-1.82252151547724,-0.0810594486462886,-1.2861435265349,-1.58337329601281,-5.79864711076063,-3.33174891166321,-5.4136870450468,-4.73765312586172,-6.69212394121198,-2.69752283619741,-1.78353553981187,-1.73677957338868,-2.38993482968795,-4.11680737531645,-1.16195413265596,0.506739269540331,-3.48009970882152,-0.376203414422354,-0.857598843272268,-1.83883839861107,0.74165954595812,-0.483336213686286,-0.837543346658189],"y":[0.169080929169469,0.158594341647139,0.612790925478432,0.330364090346352,0.849857336122177,0.420829674761175,0.185487991847175,-3.46629168307858,0.884970670884727,0.104153973985505,-2.78872554651875,-0.509753102437503,-1.37106595074677,-0.846144028623397,-0.476804903415557,-1.60685846193281,-0.806175321541067,0.398937905462601,0.603424819189591,0.534784578152911,0.972466212708072,-0.133406012583611,0.840472525659368,1.54179924537503,1.93220898225058,-1.01661683207685],"z":[0.830633678003543,0.950778721336475,0.627451596375145,2.01936685595534,1.39320085927018,1.32853220505203,1.30822664312303,0.302118087831581,1.69711392323811,1.54801778746243,0.457511416535522,-1.26844409195779,-0.674147572053593,-0.513832701768764,-0.253922198262404,0.921172512589743,-0.603020914492413,0.526093381610655,0.922606724473602,0.827893426285318,1.24075498108795,0.309405709839211,0.494844601168968,0.177126990631499,-0.0348071338903448,3.76743718992213],"type":"scatter3d","mode":"markers","name":"authentic","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[1.89232730615552,2.31625197081297,1.94393216636709,2.34865446086109,1.59293606077308,2.28848462782354,2.3066709029764,2.21854726758332,2.15878700617488,1.4656066349957,1.84789664963087,1.98050000431801,2.11417896993608,1.92511528500568,1.90898306379699,2.10910726441007,2.75198112189348,2.12520705223765,1.35976192555562,1.52397032649843,1.80403923964429,2.22756214659047,1.8542779384242,2.16467424101417,2.3541295612516,1.08529816975419,2.23861826953206,0.568768839137491],"y":[0.710448807271158,0.273696215566772,-0.733825165265762,0.641869477837081,-0.0935756718069633,1.01880950381587,0.155548305421993,0.66196106476181,0.726054333896771,-0.234591418650171,-0.473872699375168,0.200761685053095,0.370499665323442,-0.546162434730461,0.273898390721125,0.211214336229166,-1.01666608506747,0.597693203773363,-0.990733535829335,-0.824011044855591,-0.100157127138289,-0.444780818660945,-0.579827665813346,-0.34521607208014,-0.52480404199934,-2.28599043822512,-0.0628289610638123,-2.51170645654788],"z":[0.194182681224529,0.447745333699579,-0.328865970554087,-0.351341081414347,0.646267678203908,-0.602682448547042,0.529470397788582,0.393436242354996,0.266598152217312,0.90964172775609,1.13633230253395,0.933711245781841,0.387333762059552,0.489599465323024,0.783771414015199,0.59322518337101,-2.30291766475496,0.345297294954782,0.867489327691676,1.48048798956673,0.577424329583108,-0.02204326191445,0.530765010114453,0.578980134288455,-0.356071526981903,0.362070429497829,0.755477085176392,-0.559602936837571],"type":"scatter3d","mode":"markers","name":"commercial","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="lda-full-data" class="section level2">
+<h2><span class="header-section-number">3.4</span> LDA (full data)</h2>
+<div id="scatterplot" class="section level3">
+<h3><span class="header-section-number">3.4.1</span> Scatterplot</h3>
+<pre class="r"><code>d2 = cbind(type = d$type, mat.scaled %&gt;% as.tibble()) %&gt;% as_tibble()
+
+# LDA model
+EDA.mdl.lda = lda(data = d2, type ~., prior = rep(1/3, 3))
+EDA.lda = cbind(type.predicted = predict(EDA.mdl.lda)$class, # labels predicted
+                type.actual = d2$type, # labels actual
+                code = d$code, # unique sequential sample code
+                predict(EDA.mdl.lda)$x %&gt;% as_tibble() ) %&gt;%  # 1st and 2nd discriminant
+  mutate(status = type.predicted == type.actual) %&gt;%
+  as_tibble()
+# EDA.lda
+
+
+# actual separation
+plt.lda.actual = EDA.lda %&gt;%
+  ggplot(aes(x = LD1, y = LD2, col = type.actual)) +
+  # confidence ellipse as background
+  stat_ellipse(level = .8, linetype = &quot;dashed&quot;) +
+  # add sample labels
+  geom_text(aes(label = code), fontface = &quot;bold&quot;, size = 3) +
+  labs(title = &quot;Actual classification&quot;) +
+  # theme
+  theme(legend.position = &quot;bottom&quot;) +
+  scale_color_brewer(palette = &quot;Set1&quot;) +
+  scale_fill_brewer(palette = &quot;Set1&quot;)
+# plt.lda.actual
+
+
+# predicted separation
+plt.lda.predicted =
+  # correct prediction
+  EDA.lda %&gt;% filter(status == T) %&gt;%
+  ggplot(aes(x = LD1, y = LD2, col = type.predicted)) +
+  # confidence ellipse as background
+  stat_ellipse(level = .8, linetype = &quot;dashed&quot;) +
+  # add sample labels
+  geom_text(aes(label = code), fontface = &quot;bold&quot;, size = 3) +
+  labs(title = &quot;Predicted classification&quot;) +
+  # false prediction
+  geom_label_repel(data = EDA.lda %&gt;% filter(status == F),
+                   aes(label = code, fill = type.predicted),
+                   color = &quot;white&quot;, fontface = &quot;bold&quot;, label.size = 0) + # no border line
+  # theme
+  theme(legend.position = &quot;bottom&quot;) +
+  scale_color_brewer(palette = &quot;Set1&quot;) +
+  scale_fill_brewer(palette = &quot;Set1&quot;) +
+  annotate(geom = &quot;text&quot;, label  = &quot;Squared numbers indicate \nincorrect predictions.&quot;,
+           x = 1.5, y = 2.1, fontface = &quot;bold&quot;, size = 2.5)
+
+# plt.lda.predicted</code></pre>
+<pre class="r"><code>plt.lda.scatterPlot = plot_grid(plt.lda.actual, plt.lda.predicted, nrow = 1,
+                                labels = c(&quot;A&quot;, &quot;B&quot;))
+plt.lda.scatterPlot</code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-9-1.png" width="1152" /></p>
+</div>
+<div id="decision-boundary" class="section level3">
+<h3><span class="header-section-number">3.4.2</span> Decision boundary</h3>
+<pre class="r"><code># mark decision boundary based on full data
+LDcenter = EDA.lda %&gt;%
+  group_by(type.actual) %&gt;%
+  summarise(LD1.mean = mean(LD1), LD2.mean = mean(LD2))
+
+LDcenter.adulterated = LDcenter[1, 2:3]
+LDcenter.authentic = LDcenter[2, 2:3]
+LDcenter.commercial = LDcenter[3, 2:3]
+
+LD1.min = EDA.lda$LD1 %&gt;% min()
+LD1.max = EDA.lda$LD1 %&gt;% max()
+
+LD2.min = EDA.lda$LD2 %&gt;% min()
+LD2.max = 2.5 # EDA.lda$LD2 %&gt;% max()
+
+gridDensity = 100
+grid.LD1 = seq(LD1.min, LD1.max, length.out = gridDensity)
+grid.LD2 = seq(LD2.min, LD2.max, length.out =  (LD2.max - LD2.min) / (LD1.max - LD1.min) * gridDensity  )
+grid.LD = expand.grid(LD1 = grid.LD1, LD2 = grid.LD2)
+
+
+
+dist.adulterated = grid.LD %&gt;% apply(1, function(x) ( (x - LDcenter.adulterated)^2 ) %&gt;% sum() )
+dist.authentic = grid.LD %&gt;% apply(1, function(x) ( (x - LDcenter.authentic)^2 ) %&gt;% sum() )
+dist.commercial = grid.LD %&gt;% apply(1, function(x) ( (x - LDcenter.commercial)^2 ) %&gt;% sum() )
+
+grid.LD = grid.LD %&gt;%
+  mutate(dist.adulterated = dist.adulterated,
+         dist.authentic = dist.authentic,
+         dist.commercial = dist.commercial)
+grid.LD = grid.LD %&gt;%
+  mutate(boundary = apply(grid.LD[, 3:5], MARGIN = 1, FUN = which.min) %&gt;% as.character())
+
+grid.LD$boundary = grid.LD$boundary %&gt;% str_replace(pattern = &quot;1&quot;, replacement = &quot;adulterated&quot;)
+grid.LD$boundary = grid.LD$boundary %&gt;% str_replace(pattern = &quot;2&quot;, replacement = &quot;authentic&quot;)
+grid.LD$boundary = grid.LD$boundary %&gt;% str_replace(pattern = &quot;3&quot;, replacement = &quot;commercial&quot;)
+
+
+# Redraw LDA scatter plot with decision boundary
+plt.lda.boundary = grid.LD %&gt;% rename(type.actual = boundary) %&gt;%
+  ggplot(aes(x = LD1, y = LD2, color = type.actual)) +
+  geom_point(alpha = .2, shape = 19, size = .5) +
+  
+  # geom_point(data = EDA.lda, inherit.aes = T) +
+  # confidence ellipse as background
+  stat_ellipse(data = EDA.lda, level = .8, linetype = &quot;dashed&quot;) +
+  # add sample labels
+  geom_text(data = EDA.lda, aes(label = code), fontface = &quot;bold&quot;, size = 3) +
+  geom_label(data = EDA.lda %&gt;% filter(status != T), size = 3,
+             aes(label = code), label.r = unit(.5, &quot;lines&quot;)) +
+  # theme
+  scale_color_brewer(palette = &quot;Set1&quot;) +
+  scale_fill_brewer(palette = &quot;Set1&quot;) +
+  theme(legend.position = &quot;bottom&quot;, panel.grid = element_blank())
+
+plt.lda.boundary</code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code># grid.arrange(plt.lda.predicted, plt.lda.boundary, nrow = 2)</code></pre>
+</div>
+</div>
+</div>
+<div id="machine-learning" class="section level1">
+<h1><span class="header-section-number">4</span> Machine learning</h1>
+<div id="training-cross-validation-testing" class="section level2">
+<h2><span class="header-section-number">4.1</span> Training &amp; cross validation &amp; testing</h2>
+<div id="training-set" class="section level3">
+<h3><span class="header-section-number">4.1.1</span> Training set</h3>
+<pre class="r"><code># Data preparation
+colnames(d) = colnames(d) %&gt;% make.names() # ensure column names are suitable for ML 
+d$type = d$type %&gt;% as.factor()
+
+trainTest.split = d %&gt;% initial_split(strata = &quot;type&quot;, prop = .7, sed)
+
+# training set
+trainingSet.copy = training(trainTest.split) # as a copy of the training set
+
+trainingSet = trainingSet.copy %&gt;% select(-c(code, Sample, character)) # for machine learning training
+trainingSet.scaled = trainingSet[, -1] %&gt;% scale() %&gt;% as_tibble() %&gt;% # normalized data
+  mutate(type = trainingSet$type) %&gt;% # add type
+  select(ncol(trainingSet), 1:(ncol(trainingSet)-1)) # put type as first column
+
+# mean and standard deviation of each feature, for normalization of the test set
+mean.vector = trainingSet[, -1] %&gt;% apply(2, mean)
+sd.vector = trainingSet[, -1] %&gt;% apply(2, sd)</code></pre>
+</div>
+<div id="testing-set" class="section level3">
+<h3><span class="header-section-number">4.1.2</span> Testing set</h3>
+<pre class="r"><code># testing set, normalized based on mean and standard deviation of the training set
+testingSet.copy = testing(trainTest.split) # as a copy of the testing set with additional sample info
+
+testingSet = testingSet.copy %&gt;% select(-c(code, Sample, character))
+testingSet.scaled = testingSet %&gt;% select(-type) %&gt;% scale(center = mean.vector, scale = sd.vector) %&gt;%
+  as_tibble() %&gt;% mutate(type = testingSet$type) %&gt;% # add actual type of the test set
+  select(ncol(testingSet), 1:(ncol(testingSet)-1)) # put type as first column</code></pre>
+</div>
+<div id="cross-validation-cv-folds" class="section level3">
+<h3><span class="header-section-number">4.1.3</span> Cross-validation (CV) folds</h3>
+<pre class="r"><code># CV-fold of the training set, for hyperparameter tune &amp; model performance comparison
+trainingSet.cv = trainingSet %&gt;% 
+  vfold_cv(v = 5) %&gt;%
+  mutate(train = map(.x = splits, .f = ~training(.x)),
+         validate = map(.x = splits, .f = ~testing(.x)))
+
+# scale training and validation fold (based on the corresponding training fold)
+trainingSet.cv.scaled = trainingSet.cv %&gt;%
+  mutate(train.mean = map(.x = train, .f = ~ apply(.x[, -1], 2, mean)),
+         train.sd = map(.x =  train, .f = ~ apply(.x[, -1], 2, sd)),
+         # wrap mean and std into a list: 1st mean; 2nd std (or instead use pmap function for succinct coding)
+         train.mean.sd = map2(.x = train.mean, .y = train.sd, .f = ~list(.x, .y)), 
+         
+         # normalize training; note type as the last column 
+         train.scaled = map(.x = train, .f = ~ .x[, -1] %&gt;% scale() %&gt;% as_tibble() %&gt;% mutate(type = .x$type) ),
+         # normalize validation fold based corresponding training fold; note type as the last column
+         validate.scaled = map2(.x = validate, .y = train.mean.sd,
+                                .f = ~ .x[, -1] %&gt;% scale(center = .y[[1]], scale = .y[[2]]) %&gt;% as_tibble() %&gt;% mutate(type = .x$type) ),
+         # actual validation result
+         validate.actual = map(.x = validate.scaled, .f = ~.x$type)
+  ) %&gt;%
+  select(-c(train, validate, train.mean, train.sd, splits))
+
+trainingSet.cv.scaled</code></pre>
+<pre><code>## # A tibble: 5 x 5
+##   id    train.mean.sd train.scaled       validate.scaled    validate.actual
+##   &lt;chr&gt; &lt;named list&gt;  &lt;named list&gt;       &lt;named list&gt;       &lt;named list&gt;   
+## 1 Fold1 &lt;list [2]&gt;    &lt;tibble [52 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;     
+## 2 Fold2 &lt;list [2]&gt;    &lt;tibble [52 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;     
+## 3 Fold3 &lt;list [2]&gt;    &lt;tibble [52 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;     
+## 4 Fold4 &lt;list [2]&gt;    &lt;tibble [52 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;     
+## 5 Fold5 &lt;list [2]&gt;    &lt;tibble [52 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;</code></pre>
+</div>
+</div>
+<div id="support-vector-machine-svm" class="section level2">
+<h2><span class="header-section-number">4.2</span> Support vector machine (SVM)</h2>
+<div id="cv" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> CV</h3>
+<div id="radial-kernal" class="section level4">
+<h4><span class="header-section-number">4.2.1.1</span> Radial kernal</h4>
+<pre class="r"><code># Support vector machine -----
+# Radial kernal
+gammaTune = 10^seq(from = -6, to = 2, by = .5)
+costTune.radial = 10^seq(from = -2, to = 5, by = .5)
+
+d.CV.SVM.radial = trainingSet.cv.scaled %&gt;%
+  # factorial combination of gamma and cost to tune
+  crossing(gamma = gammaTune, cost = costTune.radial) %&gt;% 
+  mutate(hyperParameter = map2(.x = gamma, .y = cost, .f = ~list(.x, .y) ),
+         # cross validation, set up model for each training fold
+         model = map2(.x = train.scaled, .y = hyperParameter, 
+                      .f = ~svm(data = .x, type ~., gamma = .y[[1]], cost = .y[[2]],  
+                                type = &quot;C-classification&quot;, kernel = &quot;radial&quot;)),
+         validate.fitted =  map2(.x = model, .y = validate.scaled, .f = ~predict(.x, .y)))
+
+
+# Def func. comparing validation fold actual label vs. fitted label
+func.cv.prediction = function(dataset){
+  dataset %&gt;% mutate(
+    # Note that &quot;validate.fitted&quot; term is outside the function, separately specified by different models due to syntax difference
+    # Note that the term &quot;validate.fitted&quot; should be used uniformly across different ML methods
+    # actual vs. predicted of the validation set
+    validate.fitted.vs.actual = map2(.x = validate.fitted, .y = validate.actual, .f = ~ .x == .y ), 
+    accuracy = map_dbl(.x = validate.fitted.vs.actual, .f = ~ round(sum(.x) / length(.x) * 100, 3) ))
+}
+
+# predict on validation fold using prior defined function
+d.CV.SVM.radial = d.CV.SVM.radial %&gt;%  func.cv.prediction()
+
+
+# summarize radial kernel CV result
+d.tune.svm.radial = d.CV.SVM.radial %&gt;%
+  group_by(gamma, cost) %&gt;%
+  summarise(accuracy.mean = mean(accuracy),
+            accuracy.sd = sd(accuracy)) %&gt;%
+  arrange(desc(accuracy.mean))
+d.tune.svm.radial</code></pre>
+<pre><code>## # A tibble: 255 x 4
+## # Groups:   gamma [17]
+##     gamma     cost accuracy.mean accuracy.sd
+##     &lt;dbl&gt;    &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+##  1 0.1        10            89.2        8.77
+##  2 0.0316     10            87.7       14.0 
+##  3 0.1        31.6          87.7        8.77
+##  4 0.1       100            87.7        8.77
+##  5 0.1       316.           87.7        8.77
+##  6 0.1      1000            87.7        8.77
+##  7 0.1      3162.           87.7        8.77
+##  8 0.1     10000            87.7        8.77
+##  9 0.1     31623.           87.7        8.77
+## 10 0.1    100000            87.7        8.77
+## # … with 245 more rows</code></pre>
+<pre class="r"><code># Func. def: plotting SVM hyper-parameter tuning result
+func.plot.tune.HyperParam = function( data, hyper1, hyper2){ 
+  # hyper 1 = &quot;gamma&quot; for radial, or &quot;degree&quot; for polynomial; hyper2 = &quot;cost&quot; for SVM 
+  data %&gt;% ggplot(aes_string(x = hyper1, y = hyper2, z = &quot;accuracy.mean&quot;)) +
+    geom_tile(aes(fill = accuracy.mean)) + 
+    scale_fill_viridis(option = &quot;A&quot;, alpha = .9)  + 
+    # stat_contour(color = &quot;grey&quot;, size = .5) +
+    coord_fixed() +
+    theme(panel.grid.minor = element_line(colour = &quot;black&quot;, size = 2),
+          panel.grid.major = element_blank())
+}
+
+plt.svm.tune.radial = 
+  d.tune.svm.radial %&gt;% func.plot.tune.HyperParam(hyper1 = &quot;gamma&quot;, hyper2 = &quot;cost&quot;) +
+  scale_x_log10(breaks = gammaTune, labels = log10(gammaTune)  ) + 
+  scale_y_log10(breaks = costTune.radial, labels = log10(costTune.radial) ) +
+  labs(x = &quot;gamma, 10 ^ X&quot;, y = &quot;cost, 10 ^ X&quot;, title = &quot;SVM Radial Kernel&quot;) 
+plt.svm.tune.radial</code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+<div id="polynomial-kenel" class="section level4">
+<h4><span class="header-section-number">4.2.1.2</span> Polynomial kenel</h4>
+<pre class="r"><code>polynomialDegree = 2:7
+costTune.polynomial = 10^seq(from = -2, to = 5, by = .5)
+
+d.CV.SVM.polynomial = trainingSet.cv.scaled %&gt;%
+  # factorial combination of polynomial degree and cost to tune
+  crossing(degree = polynomialDegree, cost = costTune.polynomial) %&gt;% 
+  mutate(hyperParameter = map2(.x = degree, .y = cost, .f = ~list(.x, .y) ),
+         # cross validation, set up model for each training fold
+         model = map2(.x = train.scaled, .y = hyperParameter, 
+                      .f = ~svm(data = .x, type ~., degree = .y[[1]], cost = .y[[2]],  
+                                type = &quot;C-classification&quot;, kernel = &quot;polynomial&quot;)),
+         validate.fitted =  map2(.x = model, .y = validate.scaled, .f = ~predict(.x, .y)))
+
+# predict on validation fold using prior defined function
+d.CV.SVM.polynomial = d.CV.SVM.polynomial %&gt;% func.cv.prediction()
+
+# summarize tune result of polynomial kernel
+d.tune.svm.polynomial = d.CV.SVM.polynomial %&gt;% 
+  group_by(degree, cost) %&gt;%
+  summarise(accuracy.mean = mean(accuracy),
+            accuracy.sd = sd(accuracy)) %&gt;%
+  arrange(desc(accuracy.mean))
+d.tune.svm.polynomial</code></pre>
+<pre><code>## # A tibble: 90 x 4
+## # Groups:   degree [6]
+##    degree     cost accuracy.mean accuracy.sd
+##     &lt;int&gt;    &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+##  1      3    100            81.5        8.77
+##  2      3    316.           81.5        8.77
+##  3      3   1000            81.5        8.77
+##  4      3   3162.           81.5        8.77
+##  5      3  10000            81.5        8.77
+##  6      3  31623.           81.5        8.77
+##  7      3 100000            81.5        8.77
+##  8      3     31.6          80         10.3 
+##  9      5  10000            78.5       15.8 
+## 10      5  31623.           78.5       15.8 
+## # … with 80 more rows</code></pre>
+<pre class="r"><code># plot tune result of polynomial kernel
+plt.svm.tune.polynomial = 
+  d.tune.svm.polynomial %&gt;% func.plot.tune.HyperParam(hyper1 = &quot;degree&quot;, hyper2 = &quot;cost&quot;) +
+  scale_x_continuous(breaks = polynomialDegree) + 
+  scale_y_log10(breaks = costTune.polynomial, labels = log10(costTune.polynomial) ) +
+  labs(x = &quot;Degree&quot;, y = &quot;Cost, 10 ^ X&quot;, title = &quot;SVM Polynomial Kernel&quot;) 
+plt.svm.tune.polynomial</code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</div>
+<div id="linear-kernel" class="section level4">
+<h4><span class="header-section-number">4.2.1.3</span> Linear kernel</h4>
+<pre class="r"><code>costTune.linear = 10^seq(from = -2, to = 5, by = .5)
+
+d.CV.SVM.linear = trainingSet.cv.scaled %&gt;%
+  crossing(cost = costTune.linear) %&gt;% 
+  mutate(model = map2(.x = train.scaled, .y = cost, 
+                      .f = ~svm(data = .x, type ~., cost = .y,  
+                                type = &quot;C-classification&quot;, kernel = &quot;linear&quot;)),
+         validate.fitted =  map2(.x = model, .y = validate.scaled, .f = ~predict(.x, .y)))
+
+d.CV.SVM.linear = d.CV.SVM.linear %&gt;% func.cv.prediction()
+
+d.tune.svm.linear = d.CV.SVM.linear %&gt;% 
+  group_by(cost) %&gt;%
+  summarise(accuracy.mean = mean(accuracy),
+            accuracy.sd = sd(accuracy)) %&gt;%
+  arrange(desc(accuracy.mean))
+d.tune.svm.linear</code></pre>
+<pre><code>## # A tibble: 15 x 3
+##           cost accuracy.mean accuracy.sd
+##          &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+##  1      0.316           84.6       12.2 
+##  2      1               83.1       14.8 
+##  3      0.1             81.5       16.0 
+##  4    316.              80          8.77
+##  5   1000               80          8.77
+##  6   3162.              80          8.77
+##  7  10000               80          8.77
+##  8  31623.              80          8.77
+##  9 100000               80          8.77
+## 10     10               78.5        6.44
+## 11     31.6             78.5        6.44
+## 12    100               78.5        6.44
+## 13      3.16            78.5       10.0 
+## 14      0.0316          73.8        6.88
+## 15      0.01            47.7       23.3</code></pre>
+<pre class="r"><code>d.tune.svm.linear %&gt;% ggplot(aes(x = cost, y = accuracy.mean)) + 
+  geom_bar(stat = &quot;identity&quot;, alpha = .8) + geom_point() + geom_line() + 
+  scale_x_log10() </code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>k1 = d.tune.svm.radial[1, 3:4] %&gt;% mutate(kernel = &quot;radial&quot;)
+k2 = d.tune.svm.polynomial[1, 3:4] %&gt;% mutate(kernel = &quot;polynomial&quot;) # best degree 3
+k3 = d.tune.svm.linear[1, 2:3]  %&gt;% mutate(kernel = &quot;linear&quot;) 
+
+rbind(k1, k2, k3)</code></pre>
+<pre><code>## # A tibble: 3 x 3
+##   accuracy.mean accuracy.sd kernel    
+##           &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;     
+## 1          89.2        8.77 radial    
+## 2          81.5        8.77 polynomial
+## 3          84.6       12.2  linear</code></pre>
+<pre class="r"><code># radial kernel renders the best cross-validation result up to 90.4 (sd 6.08) % overal accuracy, with hyper-parameter gamma 0.1 and cost 10. Linear kernel gives 82.1% accuracy. Polynomial with optimal degree 3 achieved 82.4% accuracy. Both linear and polynomial kernel generated much higher validation standard deviation.
+
+cv.svm = k1 %&gt;% mutate(model = &quot;SVM&quot;)</code></pre>
+</div>
+</div>
+<div id="training-testing" class="section level3">
+<h3><span class="header-section-number">4.2.2</span> Training &amp; testing</h3>
+<pre class="r"><code>mdl.svm = svm(data = trainingSet.scaled, type ~., 
+              # gamma = d.tune.svm.radial$gamma[1], cost = d.tune.svm.radial$cost[1],
+              kernel = &quot;radial&quot;, type = &quot;C-classification&quot;)
+
+accuracy.training.svm = sum(predict(mdl.svm) == trainingSet.scaled$type) / nrow(trainingSet.scaled)*100
+cat(&quot;Accuracy on the training set is&quot;, accuracy.training.svm, &quot;%.&quot;)</code></pre>
+<pre><code>## Accuracy on the training set is 93.84615 %.</code></pre>
+<pre class="r"><code>accuracy.testing.svm = sum(predict(mdl.svm, newdata = testingSet.scaled) == testingSet.scaled$type) / nrow(testingSet.scaled) *100
+cat(&quot;Accuracy on the testing set is&quot;, accuracy.testing.svm, &quot;%.&quot;)</code></pre>
+<pre><code>## Accuracy on the testing set is 80 %.</code></pre>
+<pre class="r"><code># confusion matrix
+predict.SVM = predict(mdl.svm, newdata = testingSet.scaled)
+
+# Def. func: converting confusion table into tibble format
+func.tidyConfusionTable = function(table, modelName){
+  tb = table %&gt;% as.data.frame() %&gt;% spread(Var2, value = Freq) %&gt;% mutate(model = modelName)
+  colnames(tb) = colnames(tb) %&gt;% str_extract(pattern = one_or_more(WRD) )
+  return(tb)
+}
+cf.svm = table(predict.SVM, testingSet.scaled$type) %&gt;% 
+  func.tidyConfusionTable(modelName = &quot;SVM&quot;)</code></pre>
+</div>
+</div>
+<div id="linear-discriminant-analysis-lda" class="section level2">
+<h2><span class="header-section-number">4.3</span> Linear discriminant analysis (LDA)</h2>
+<div id="cv-1" class="section level3">
+<h3><span class="header-section-number">4.3.1</span> CV</h3>
+<pre class="r"><code># Cross validation performance (checking performance only, not for hyper-param tune)
+d.CV.LDA = trainingSet.cv.scaled %&gt;%
+  mutate(model = map(.x = train.scaled, .f = ~lda(data = .x, type ~ ., prior = rep(1/3, 3))),
+         validate.fitted = map2(.x = model, .y = validate.scaled, .f = ~predict(.x, newdata = .y)$class)) %&gt;%
+  func.cv.prediction()
+
+cv.LDA = data.frame(accuracy.mean = d.CV.LDA$accuracy %&gt;% mean(),
+                    accuracy.sd = d.CV.LDA$accuracy %&gt;% sd()) %&gt;%
+  mutate(model = &quot;LDA&quot;)</code></pre>
+</div>
+<div id="training-testing-1" class="section level3">
+<h3><span class="header-section-number">4.3.2</span> Training &amp; testing</h3>
+<pre class="r"><code># set up model on entire training set
+mdl.lda = lda(data = trainingSet.scaled, type ~., prior = rep(1/3, 3))
+
+# Prediction on the training set
+accuracy.training.LDA = sum(predict(mdl.lda)$class == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
+cat(&quot;Accuracy on the training set by Linear Discriminant Analysis is&quot;, accuracy.training.LDA, &quot;%.&quot; )</code></pre>
+<pre><code>## Accuracy on the training set by Linear Discriminant Analysis is 87.69231 %.</code></pre>
+<pre class="r"><code># Prediction on the testing set 
+fitted.lda = predict(mdl.lda, newdata = testingSet.scaled)
+predict.LDA = fitted.lda$class
+
+cf.lda = table(predict.LDA, testingSet.scaled$type) %&gt;%
+  func.tidyConfusionTable(modelName = &quot;LDA&quot;)
+
+accuracy.testing.lda = sum(predict(mdl.lda, newdata = testingSet.scaled)$class == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
+cat(&quot;Accuracy on the testing set by Linear Discriminant Analysis is&quot;, accuracy.testing.lda, &quot;%.&quot;)</code></pre>
+<pre><code>## Accuracy on the testing set by Linear Discriminant Analysis is 64 %.</code></pre>
+<pre class="r"><code># probability distribution sample-wise
+d.prob.lda = fitted.lda$posterior %&gt;% as_tibble() %&gt;% mutate(model = &quot;LDA&quot;)</code></pre>
+</div>
+</div>
+<div id="random-forest" class="section level2">
+<h2><span class="header-section-number">4.4</span> Random forest</h2>
+<div id="cv-2" class="section level3">
+<h3><span class="header-section-number">4.4.1</span> CV</h3>
+<pre class="r"><code>featuresTune = 2:8
+treesTune = seq(from = 100, to = 1000, by = 100)
+
+d.CV.RF = trainingSet.cv.scaled %&gt;%
+  crossing(features = featuresTune, trees = treesTune) %&gt;%
+  mutate(parameters = map2(.x = features, .y = trees, .f = ~list(.x, .y)),  # No. of features 1st; No. trees 2nd
+         model = map2(.x = train.scaled, .y = parameters, 
+                      .f = ~ randomForest(data = .x, type ~.,
+                                          mtry = .y[[1]], ntrees = .y[[2]]))
+  )
+
+d.CV.RF = d.CV.RF %&gt;% # prediction of the validate fold
+  mutate(validate.fitted =  map2(.x = model, .y = validate.scaled, .f = ~ predict(.x, .y)),
+         # actual validation result
+         validate.actual = map(.x = validate.scaled, .f = ~.x$type %&gt;% as.factor),
+         # actual vs. predicted of the validation set
+         validate.fitted.vs.actual = map2(.x = validate.fitted, .y = validate.actual, .f = ~ .x == .y ), 
+         accuracy = map_dbl(.x = validate.fitted.vs.actual, .f = ~ round(sum(.x) / length(.x) * 100, 3)))
+
+d.tune.RF = d.CV.RF %&gt;%
+  group_by(trees, features) %&gt;%
+  summarise(accuracy.mean = mean(accuracy),
+            accuracy.sd = sd(accuracy)) %&gt;%
+  arrange(desc(accuracy.mean))
+d.tune.RF</code></pre>
+<pre><code>## # A tibble: 70 x 4
+## # Groups:   trees [10]
+##    trees features accuracy.mean accuracy.sd
+##    &lt;dbl&gt;    &lt;int&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+##  1   100        3          86.2        8.43
+##  2   200        3          86.2        8.43
+##  3   300        2          86.2        8.43
+##  4   500        2          86.2        8.43
+##  5   500        3          86.2        8.43
+##  6   500        4          86.2        8.43
+##  7   600        3          86.2        8.43
+##  8   600        4          86.2        8.43
+##  9   600        5          86.2        8.43
+## 10   700        4          86.2        8.43
+## # … with 60 more rows</code></pre>
+<pre class="r"><code>plt.RF.tune = d.tune.RF %&gt;% 
+  func.plot.tune.HyperParam(hyper1 = &quot;trees&quot;, hyper2 = &quot;features&quot;) +
+  coord_fixed(ratio = 100) + # an arbitrary ratio for nice display
+  scale_x_continuous(breaks = treesTune) +
+  scale_y_continuous(breaks = featuresTune) 
+plt.RF.tune</code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<pre class="r"><code>cv.RF = d.tune.RF[1, ] %&gt;% ungroup() %&gt;%  
+  select(contains(&quot;accuracy&quot;)) %&gt;% mutate(model = &quot;RF&quot;)</code></pre>
+</div>
+<div id="training-testing-2" class="section level3">
+<h3><span class="header-section-number">4.4.2</span> Training &amp; testing</h3>
+<pre class="r"><code># train model using entire training set
+mdl.rf = randomForest(data = trainingSet.scaled, type ~., num.trees = 900, mtry = 2)
+
+# Prediction on the training set
+accuracy.training.RF = 
+  sum(predict(mdl.rf, data = trainingSet.scaled) == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
+cat(&quot;Accuracy on the training set by Random Forest is&quot;, accuracy.training.RF, &quot;%&quot;)</code></pre>
+<pre><code>## Accuracy on the training set by Random Forest is 87.69231 %</code></pre>
+<pre class="r"><code># Prediction on the testing set by RF
+predict.RF = predict(mdl.rf, testingSet.scaled, type = &quot;response&quot;)
+
+cf.RF = table(predict.RF, testingSet.scaled$type) %&gt;% 
+  func.tidyConfusionTable(modelName = &quot;RF&quot;)
+
+accuracy.testing.RF = sum(predict.RF == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
+cat(&quot;Accuracy on the testing set using Random Forest is&quot;, accuracy.testing.RF, &quot;%&quot;) </code></pre>
+<pre><code>## Accuracy on the testing set using Random Forest is 84 %</code></pre>
+<pre class="r"><code># Probability distribution of predicted test set
+d.prob.RF = predict(mdl.rf, testingSet.scaled, type = &quot;prob&quot;) %&gt;%
+  as_tibble() %&gt;%
+  mutate(model = &quot;RF&quot;)</code></pre>
+</div>
+</div>
+<div id="naive-bayes" class="section level2">
+<h2><span class="header-section-number">4.5</span> Naive Bayes</h2>
+<div id="cv-3" class="section level3">
+<h3><span class="header-section-number">4.5.1</span> CV</h3>
+<pre class="r"><code># cross validation to evaluate model performance (not for tune of hyper-param)
+d.CV.NB = trainingSet.cv.scaled %&gt;%
+  mutate(model = map(.x = train.scaled, .f = ~naiveBayes(data = .x, type ~ ., prior = rep(1/3, 3))),
+         validate.fitted = map2(.x = model, .y = validate.scaled, .f = ~predict(.x, newdata = .y))) %&gt;%
+  func.cv.prediction()
+
+cv.NB = data.frame(accuracy.mean = d.CV.NB$accuracy %&gt;% mean(),
+                   accuracy.sd = d.CV.NB$accuracy %&gt;% sd()) %&gt;%
+  mutate(model = &quot;NB&quot;)</code></pre>
+</div>
+<div id="training-testing-3" class="section level3">
+<h3><span class="header-section-number">4.5.2</span> Training &amp; testing</h3>
+<pre class="r"><code># Set up model on entire training set
+mdl.nb = naiveBayes(x = trainingSet.scaled[, -1], 
+                    y = trainingSet.scaled$type %&gt;% as.factor(), # y has to be factor 
+                    prior = c(1/3, 1/3, 1/3)) 
+
+accuracy.training.NB = sum(predict(mdl.nb, newdata = trainingSet.scaled[, -1]) == trainingSet.scaled$type)/nrow(trainingSet.scaled) * 100
+cat(&quot;Accuracy on the training set using Naive Bayes is&quot;, accuracy.training.NB, &quot;%.&quot;)</code></pre>
+<pre><code>## Accuracy on the training set using Naive Bayes is 90.76923 %.</code></pre>
+<pre class="r"><code>predict.NB = predict(mdl.nb, testingSet.scaled[, -1])
+
+cf.NB = table(predict.NB, testingSet.scaled$type) %&gt;% 
+  func.tidyConfusionTable(modelName = &quot;NB&quot;)
+
+accuracy.testing.NB = sum(predict.NB == testingSet.scaled$type)/nrow(testingSet.scaled) * 100
+cat(&quot;Accuracy on the testing set using Naive Bayes is&quot;, accuracy.testing.NB, &quot;%.&quot;)</code></pre>
+<pre><code>## Accuracy on the testing set using Naive Bayes is 72 %.</code></pre>
+<pre class="r"><code>d.prob.NB = predict(mdl.nb, testingSet.scaled[, -1], type = &quot;raw&quot;)  %&gt;%
+  as_tibble() %&gt;% mutate(model = &quot;NB&quot;)
+# d.prob.NB</code></pre>
+</div>
+</div>
+<div id="logistic-softmax-regression" class="section level2">
+<h2><span class="header-section-number">4.6</span> logistic (softmax) regression</h2>
+<div id="cv-4" class="section level3">
+<h3><span class="header-section-number">4.6.1</span> CV</h3>
+<pre class="r"><code># cross validation to check model performance. 
+d.CV.LR = trainingSet.cv.scaled %&gt;%
+  mutate(model = map(.x = train.scaled, # note that in train and validate folds, the type is the last column
+                     .f = ~ cv.glmnet(x = .x[, -ncol(.x)] %&gt;% as.matrix(), y = .x$type,
+                                      # important that input x has to be matrix!
+                                      family = &quot;multinomial&quot;, alpha = 1)),
+         validate.fitted = map2(.x = model, .y = validate.scaled, 
+                                .f = ~ predict(.x, newx = .y[, -ncol(.y)] %&gt;% as.matrix(), 
+                                               type = &quot;class&quot;, s = .x$lambda.1se ) %&gt;% c() )) %&gt;%
+  func.cv.prediction()
+
+cv.LR = data.frame(accuracy.mean = d.CV.LR$accuracy %&gt;% mean(),
+                   accuracy.sd = d.CV.LR$accuracy %&gt;% sd()) %&gt;%
+  mutate(model = &quot;LR&quot;)</code></pre>
+</div>
+<div id="training-testing-4" class="section level3">
+<h3><span class="header-section-number">4.6.2</span> Training &amp; testing</h3>
+<pre class="r"><code># set up model on entire training set
+softmax.cv = cv.glmnet(x = trainingSet.scaled[, -1] %&gt;% as.matrix(), 
+                       y = trainingSet.scaled$type, family = &quot;multinomial&quot;, alpha = 1)
+plot(softmax.cv)</code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<pre class="r"><code># Prediction on the training set
+fitted.softmax.train = predict(softmax.cv, newx = trainingSet.scaled[, -1] %&gt;% as.matrix(),
+                               s = softmax.cv$lambda.1se, type = &quot;class&quot;) %&gt;% c()
+
+accuracy.training.LR = sum(fitted.softmax.train == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
+cat(&quot;Accuracy on the training set using lasso-regularized softmax regression is&quot;, accuracy.training.LR, &quot;%.&quot;) </code></pre>
+<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 89.23077 %.</code></pre>
+<pre class="r"><code># Prediction on the testing set
+predict.softmax = predict(softmax.cv, newx = testingSet.scaled[, -1] %&gt;% as.matrix(),
+                          s = softmax.cv$lambda.1se, type = &quot;class&quot;) %&gt;% c()
+
+cf.LR = table(predict.softmax, testingSet.scaled$type) %&gt;%
+  func.tidyConfusionTable(modelName = &quot;LR&quot;)
+
+accuracy.testing.LR = sum(predict.softmax == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
+cat(&quot;Accuracy on the training set using lasso-regularized softmax regression is&quot;, accuracy.testing.LR, &quot;%.&quot;) </code></pre>
+<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 76 %.</code></pre>
+<pre class="r"><code>table(predict.softmax, testingSet.scaled$type)</code></pre>
+<pre><code>##                
+## predict.softmax adulterated authentic commercial
+##     adulterated           6         1          1
+##     authentic             3         6          0
+##     commercial            1         0          7</code></pre>
+<pre class="r"><code># Predicted probability distribution on the test set
+d.prob.LR = predict(softmax.cv, newx = testingSet.scaled[, -1] %&gt;% as.matrix(),
+                    s = softmax.cv$lambda.1se, type = &quot;response&quot;) %&gt;%
+  as_tibble() %&gt;%
+  mutate(model = &quot;LR&quot;)
+
+colnames(d.prob.LR) = colnames(d.prob.LR) %&gt;% str_extract(one_or_more(WRD))
+# d.prob.LR</code></pre>
+</div>
+</div>
+<div id="all-models-comparison" class="section level2">
+<h2><span class="header-section-number">4.7</span> All models comparison</h2>
+<p><em>This section summarized the prediction result of each model on the testing set.</em> ### Probability distribution</p>
+<pre class="r"><code># prob distribution 
+func.addSampleInfo = function(dataset) {
+  dataset %&gt;% cbind(testingSet.copy %&gt;% select(code, Sample, type, character))
+}
+
+d.prob.lda = d.prob.lda %&gt;% func.addSampleInfo()
+d.prob.NB = d.prob.NB %&gt;% func.addSampleInfo()
+d.prob.LR = d.prob.LR %&gt;% func.addSampleInfo()
+d.prob.RF = d.prob.RF %&gt;% func.addSampleInfo()
+d.prob = d.prob.lda %&gt;% rbind(d.prob.NB) %&gt;% rbind(d.prob.LR) %&gt;% rbind(d.prob.RF)
+
+# plot sample-model wise probability distribution 
+plt.probabilityDistribution = d.prob %&gt;%
+  gather(c(adulterated, authentic, commercial), key = type, value = prob) %&gt;%
+  ggplot(aes(x = code, y = prob, fill = type)) +
+  geom_bar(stat = &quot;identity&quot;, alpha = .8, color = &quot;white&quot;, size = .1, position = &quot;stack&quot;) +
+  facet_wrap(~model, nrow = 1) +
+  coord_flip() + 
+  scale_fill_startrek() +
+  theme(panel.border = element_blank(),
+        panel.grid = element_blank(),
+        # the vertical axis title and text refers to identity prediciton plot
+        axis.title.y = element_blank(), 
+        axis.text.y = element_blank()) +
+  scale_y_continuous(breaks = seq(0, 1, by = 1)) +
+  labs(y = &quot;Prediction probability&quot;, x = &quot;Sample code&quot;)
+# plt.probabilityDistribution</code></pre>
+<div id="sample-wise-prediction" class="section level3">
+<h3><span class="header-section-number">4.7.1</span> Sample-wise prediction</h3>
+<pre class="r"><code>d.fittedTestingset = 
+  data.frame(LDA = predict.LDA, LR = predict.softmax, NB = predict.NB, RF = predict.RF, 
+             SVM = predict.SVM) %&gt;%
+  func.addSampleInfo() %&gt;% rename(Actual = type) %&gt;% as_tibble()
+
+d.fittedTestingset.tidy = d.fittedTestingset %&gt;%
+  gather(c(LDA, LR, NB, RF, SVM, Actual), key = model, value = fittedType)
+
+plt.predictionResult = 
+  d.fittedTestingset.tidy %&gt;%  
+  ggplot(aes(x = code, y = 1, color = fittedType)) +
+  geom_segment(aes(xend = code, y = .95, yend = 1), size = 4, alpha = .8) +
+  facet_wrap(~model, nrow = 1) +
+  coord_flip() +
+  theme(strip.text = element_text(face = &quot;bold&quot;, size = 8),
+        panel.background = element_blank(),
+        panel.border = element_blank(),
+        panel.grid = element_blank(),
+        panel.spacing = unit(0, &quot;lines&quot;), # facet gap size
+        # x axis text and title in white color as placeholders for plot alignment
+        axis.text.x = element_text(colour = &quot;white&quot;),
+        axis.title.x = element_text(colour = &quot;white&quot;),
+        axis.text = element_text(size = 10),
+        axis.ticks = element_blank(),
+        legend.position = &quot;none&quot;) +
+  scale_color_startrek() +
+  labs(x = &quot;Sample code&quot;)
+# plt.predictionResult 
+
+plt.samplewisePrediction = 
+  plot_grid(plt.predictionResult, plt.probabilityDistribution, 
+            labels = c(&quot;A&quot;, &quot;B&quot;), label_size = 18, rel_widths = c(2, 4), nrow = 1)
+
+# plt.samplewisePrediction</code></pre>
+</div>
+<div id="confusion-matrix" class="section level3">
+<h3><span class="header-section-number">4.7.2</span> Confusion matrix</h3>
+<pre class="r"><code>d.cf.tidy = rbind(cf.lda, cf.LR) %&gt;% rbind(cf.NB) %&gt;% rbind(cf.RF) %&gt;% rbind(cf.svm) %&gt;%
+  gather(c(adulterated, authentic, commercial), key = actual, value = count)
+
+# Def. func. abbreviating sample types (for display in confusion matrix figure)
+func.abreviateTypes = function(vector){
+  vector %&gt;% str_replace(pattern = &quot;adulterated&quot;, replacement = &quot;AD&quot;) %&gt;%
+    str_replace(pattern = &quot;authentic&quot;, replacement = &quot;AU&quot;) %&gt;% 
+    str_replace(pattern = &quot;commercial&quot;, replacement = &quot;CO&quot;)
+} 
+
+d.cf.tidy$predict = d.cf.tidy$predict %&gt;% func.abreviateTypes()
+d.cf.tidy$actual  = d.cf.tidy$actual %&gt;% func.abreviateTypes()
+
+types = factor(c(&quot;CO&quot;, &quot;AD&quot;, &quot;AU&quot;), ordered = T)
+
+# ordered axis
+d.cf.tidy$predict = d.cf.tidy$predict %&gt;% factor(levels = types, ordered = T)
+d.cf.tidy$actual = d.cf.tidy$actual %&gt;% factor(levels = rev(types), ordered = T)
+
+
+# define color
+d.cf.tidy = d.cf.tidy %&gt;% 
+  mutate(CorrectOrNot = predict == actual,
+         diagnal = count != 0 &amp; CorrectOrNot == T,
+         offDiag.incorrect = diagnal == F &amp; count &gt; 0, 
+         judge = str_c(diagnal,&quot;_&quot;, offDiag.incorrect)) 
+
+plt.confusionMatrix = d.cf.tidy %&gt;%
+  ggplot(aes(x = actual, y = predict, fill = judge)) +
+  geom_label(aes(label = count), alpha = .5, fontface = &quot;bold&quot;, size = 5) +
+  facet_wrap(~model, nrow = 1) +
+  scale_fill_manual(values = c(&quot;FALSE_FALSE&quot; = &quot;lightgrey&quot;, 
+                               &quot;FALSE_TRUE&quot; = &quot;tomato&quot;, 
+                               &quot;TRUE_FALSE&quot; = &quot;Steelblue&quot;)) +
+  theme(legend.position = &quot;&quot;,
+        axis.text = element_text(face = &quot;bold&quot;),
+        strip.text = element_text(size = 12)) +
+  labs(x = &quot;\nActual identity&quot;, y = &quot;Prediction\n&quot;)
+# plt.confusionMatrix
+
+
+# grid.arrange(plt.confusionMatrix, plt.samplewisePrediction, nrow = 2)</code></pre>
+</div>
+<div id="cv-accuracy" class="section level3">
+<h3><span class="header-section-number">4.7.3</span> CV accuracy</h3>
+<p><em>This subsection extracted the prior CV result acquired on the training set, to be shown together with the prediction result on the testing set. </em></p>
+<pre class="r"><code># Crossvalidation result
+cv.accuracy = rbind(cv.LDA, cv.LR) %&gt;% rbind(cv.NB) %&gt;% rbind(cv.RF) %&gt;% 
+  rbind(cv.svm %&gt;% select(-kernel)) %&gt;%
+  mutate(Accuracy = paste(accuracy.mean %&gt;% round(1), &quot;±&quot;, accuracy.sd %&gt;% round(1)) ) 
+
+
+# set up theme for pure text
+theme.pureText = theme_void() +
+  # keeping the text elements in white as place holders for axis alignment with the confusion matrix
+  theme(axis.text =  element_text(colour = &quot;white&quot;), # y
+        axis.title = element_text(colour = &quot;white&quot;, size = 32),
+        # large size help text align up with confusion matrix (title wth row gap)
+        axis.text.x = element_blank(), # x title and text blank to reduce gap between text rows
+        axis.title.x = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank())
+
+# Ensure the model order is the same as shown in the confusion matrix
+plt.accuracy.cv = cv.accuracy %&gt;%
+  ggplot(aes(x = model, y = 1)) + 
+  geom_text(aes(label = Accuracy, fontface = &quot;bold&quot; )) +
+  theme.pureText
+
+# plt.accuracy.cv</code></pre>
+</div>
+<div id="training-testing-accuracy" class="section level3">
+<h3><span class="header-section-number">4.7.4</span> Training &amp; testing accuracy</h3>
+<p><em>This subsection showed the prediction accuracy on the training set and testing set.</em></p>
+<pre class="r"><code>model = c(&quot;LDA&quot;, &quot;LR&quot;, &quot;NB&quot;, &quot;RF&quot;, &quot;SVM&quot;)
+training = c(accuracy.training.LDA, accuracy.training.LR, accuracy.training.NB, accuracy.training.RF, accuracy.training.svm)
+testing = c(accuracy.testing.lda, accuracy.testing.LR, accuracy.testing.NB, accuracy.testing.RF, accuracy.testing.svm)
+d.accuracy.train.test = data.frame(model = model, accuracy.training = training, accuracy.testing = testing) 
+
+plt.accuracy.Training = d.accuracy.train.test %&gt;%
+  ggplot(aes(x = model, y = 1)) +
+  geom_text(aes(label = round(accuracy.training, 1), fontface = &quot;bold&quot; )) +
+  theme.pureText
+
+# plt.accuracy.Training  
+
+# Accuracy on the testing set
+plt.accuracy.Testing = d.accuracy.train.test %&gt;%
+  ggplot(aes(x = model, y = 1)) +
+  geom_text(aes(label = round(accuracy.testing, 2)), 
+            fontface = &quot;bold&quot;) +
+  theme.pureText 
+
+# plt.accuracy.Testing</code></pre>
+</div>
+<div id="visualization" class="section level3">
+<h3><span class="header-section-number">4.7.5</span> Visualization</h3>
+<pre class="r"><code># PLOT
+# 7.15 X 3.06 on big screen for optimal output!!
+plt.accuracy.confusionMatrix =
+  plot_grid(plt.accuracy.cv, plt.accuracy.Training, plt.accuracy.Testing, plt.confusionMatrix,
+            rel_heights = c(1, 1, 1, 7), nrow = 4,
+            labels = c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;), 
+            label_size = 15, label_x = .03,
+            label_colour = &quot;black&quot;)
+# plt.accuracy.confusionMatrix</code></pre>
+<p><strong>A</strong>,accuracy of prediction of the 5-fold cross-validation within the training set; <strong>B</strong>, prediction accuracy of the training set using models based on entire training set; <strong>C</strong>, accuracy of the testing set using models based on entire training set.</p>
+<pre class="r"><code># Version for paper, temporarily hide legend for optimal layout, then manually add it in PPT
+# Note 7.0 X 4.5 dimension on big screen !!
+plt.samplewisePrediction.paperVersion =
+  plot_grid(plt.predictionResult, 
+            plt.probabilityDistribution + theme(legend.position = &quot;none&quot;), 
+            labels = c(&quot;E&quot;, &quot;F&quot;), label_size = 15, rel_widths = c(2.5, 4), 
+            label_x = .03,
+            nrow = 1)</code></pre>
+<pre class="r"><code># Prediction result all in all
+# 7 X 7 on big screen for optimal layout
+plot_grid(plt.accuracy.confusionMatrix,
+          plt.samplewisePrediction.paperVersion,
+          nrow = 2, rel_heights = c(2.5, 4))</code></pre>
+<p><img src="LemonMLscript_files/figure-html/unnamed-chunk-33-1.png" width="1152" /></p>
+</div>
+</div>
+</div>
+<div id="model-interpretation" class="section level1">
+<h1><span class="header-section-number">5</span> Model interpretation</h1>
+<div id="random-forest-1" class="section level2">
+<h2><span class="header-section-number">5.1</span> Random forest</h2>
+<pre class="r"><code>func.plot.ICE.RF = function(feature) {
+  
+  lowerBound = trainingSet.scaled[[feature]] %&gt;% min() 
+  upperBound = trainingSet.scaled[[feature]] %&gt;% max() 
+  
+  ICE = trainingSet.scaled %&gt;% 
+    mutate(instance = 1:nrow(trainingSet.scaled)) # unique instance code for each training example
+  ICE = ICE %&gt;% select(ncol(ICE), 1:(ncol(ICE)-1))
+  
+  ICE.grid = expand.grid(instance = ICE$instance, 
+                         grid = seq(lowerBound, upperBound, length.out = 100)) %&gt;%
+    left_join(ICE, by = &quot;instance&quot;) %&gt;% as_tibble() %&gt;%
+    rename(actual.type = type)
+  
+  
+  # update feature of interest without changing feature column order
+  ICE.grid[[feature]] = ICE.grid$grid 
+  feature.grid = ICE.grid %&gt;% select(-c(grid, instance))
+  
+  # Random forest
+  ICE.fitted = predict(mdl.rf, newdata = feature.grid, type = &quot;prob&quot;)  %&gt;% as_tibble()
+  
+  
+  # Individual instance
+  ICE.fitted.tidy = ICE.fitted %&gt;% as_tibble() %&gt;%
+    mutate(instance = ICE.grid$instance, grid = ICE.grid$grid, actual.type = ICE.grid$actual.type,
+           instance = as.numeric(instance)) %&gt;%
+    gather(1:3, key = predicted.type, value = fitted.prob) 
+  
+  # the overal trend
+  ICE.fitted.tidy.OVERAL = ICE.fitted.tidy %&gt;%
+    group_by(actual.type, predicted.type, grid) %&gt;%
+    summarise(fitted.prob = mean(fitted.prob))
+  
+  # plot
+  plt.ICE = 
+    
+    ICE.fitted.tidy %&gt;%
+    ggplot(aes(x = grid, y = fitted.prob, color = actual.type)) +
+    geom_line(aes(group = instance), alpha = .3) +
+    facet_wrap(~predicted.type, nrow = 1) +
+    labs(caption = &quot;color by actual type, faceted by predicted type&quot;) +
+    scale_color_brewer(palette = &quot;Set1&quot;) +
+    labs(title = paste0(feature, &quot; (Random Forest)&quot;), 
+         x = &quot;Standard deviation grids&quot;,
+         y = &quot;Predicted probability for each class&quot;) +
+    
+    # overal trend as top layer
+    geom_line(data = ICE.fitted.tidy.OVERAL, size = 2) +
+    
+    # rug
+    geom_rug(data = trainingSet.scaled, aes_string(x = feature), 
+             inherit.aes = F, alpha = .3) +
+    
+    coord_cartesian(xlim = c(lowerBound, 2)) +
+    scale_y_continuous(breaks = seq(0, 1, by = .2))
+  # Turning point usually much ealier than grid sd 2. 
+  # a further manual adjustment than automatic range selection set by &quot;upperBound&quot;
+  
+  plt.ICE %&gt;% return()
+}</code></pre>
+</div>
+<div id="logistic-softmax-regression-1" class="section level2">
+<h2><span class="header-section-number">5.2</span> logistic (softmax) regression</h2>
+<pre class="r"><code>func.plot.ICE.logistic = function(feature) {
+  
+  lowerBound = trainingSet.scaled[[feature]] %&gt;% min() 
+  upperBound = trainingSet.scaled[[feature]] %&gt;% max() 
+  
+  ICE = trainingSet.scaled %&gt;% 
+    mutate(instance = 1:nrow(trainingSet.scaled)) # unique instance code for each training example
+  ICE = ICE %&gt;% select(ncol(ICE), 1:(ncol(ICE)-1))
+  
+  ICE.grid = expand.grid(instance = ICE$instance, 
+                         grid = seq(lowerBound, upperBound, length.out = 100)) %&gt;%
+    left_join(ICE, by = &quot;instance&quot;) %&gt;% as_tibble() %&gt;%
+    rename(actual.type = type)
+  
+  
+  # update feature of interest without changing feature column order
+  ICE.grid[[feature]] = ICE.grid$grid 
+  feature.grid = ICE.grid %&gt;% select(-c(grid, instance))
+  
+  # logistic regression
+  ICE.fitted = predict(softmax.cv, newx = feature.grid[, -1] %&gt;% as.matrix(),
+                       s = softmax.cv$lambda.1se,, type = &quot;response&quot;) %&gt;%
+    as.tibble() %&gt;%
+    rename(adulterated = adulterated.1, authentic = authentic.1, commercial = commercial.1)
+  
+  
+  # Individual instance
+  ICE.fitted.tidy = ICE.fitted %&gt;% as_tibble() %&gt;%
+    mutate(instance = ICE.grid$instance, grid = ICE.grid$grid, actual.type = ICE.grid$actual.type,
+           instance = as.numeric(instance)) %&gt;%
+    gather(1:3, key = predicted.type, value = fitted.prob) 
+  
+  # the overal trend
+  ICE.fitted.tidy.OVERAL = ICE.fitted.tidy %&gt;%
+    group_by(actual.type, predicted.type, grid) %&gt;%
+    summarise(fitted.prob = mean(fitted.prob))
+  
+  # plot
+  plt.ICE = 
+    
+    ICE.fitted.tidy %&gt;%
+    ggplot(aes(x = grid, y = fitted.prob, color = actual.type)) +
+    geom_line(aes(group = instance), alpha = .3) +
+    facet_wrap(~predicted.type, nrow = 1) +
+    scale_color_brewer(palette = &quot;Set1&quot;) +
+    labs(title = paste0(feature, &quot; (Logistic regression)&quot;), 
+         x = &quot;Standard deviation grids&quot;, 
+         y = &quot;Predicted probability for each class&quot;,
+         caption = &quot;color by actual type, faceted by predicted type&quot;) +
+    
+    # overal trend as top layer
+    geom_line(data = ICE.fitted.tidy.OVERAL, size = 2) +
+    
+    # rug
+    geom_rug(data = trainingSet.scaled, aes_string(x = feature), 
+             inherit.aes = F, alpha = .3) +
+    
+    coord_cartesian(xlim = c(lowerBound, 2)) +
+    scale_y_continuous(breaks = seq(0, 1, by = .2))
+  # Turning point usually much ealier than grid sd 2. 
+  # a further manual adjustment than automatic range selection set by &quot;upperBound&quot;
+  
+  plt.ICE %&gt;% return()
+}</code></pre>
+</div>
+<div id="visualization-1" class="section level2">
+<h2><span class="header-section-number">5.3</span> Visualization</h2>
+<p><em>The plotting iterates through all features.</em></p>
+<pre class="r"><code># Model interpretation comparison: RF vs. LR
+func.plt.ICE.modelComparison.distribution = function(featureCode = 1){
+  
+  lemonFeatures = colnames(trainingSet)[-1]
+  
+  plt.ICE.citric.acid.logistic = func.plot.ICE.logistic(feature = lemonFeatures[featureCode])
+  plt.ICE.citric.acid.randomForest = func.plot.ICE.RF(feature = lemonFeatures[featureCode])
+  
+  
+  plot_grid(plt.ICE.citric.acid.logistic, 
+            plt.ICE.citric.acid.randomForest, 
+            
+            # distribution
+            plot_grid(
+              # authentic vs. adulterated
+              d %&gt;% 
+                filter(type != &quot;commercial&quot;) %&gt;%
+                ggplot(aes_string(x = lemonFeatures[featureCode], fill = &quot;type&quot;, color = &quot;type&quot;)) +
+                geom_density(alpha = .2, position = &quot;dodge&quot;) +
+                scale_color_manual(values = color.types) +
+                scale_fill_manual(values = color.types) +
+                theme(legend.position = &quot;none&quot;), 
+              
+              # all three classes
+              d %&gt;% 
+                ggplot(aes_string(x = lemonFeatures[featureCode], fill = &quot;type&quot;, color = &quot;type&quot;)) +
+                geom_density(alpha = .2, position = &quot;dodge&quot;) +
+                scale_color_manual(values = color.types) +
+                scale_fill_manual(values = color.types), 
+              
+              # layout
+              nrow = 1, rel_widths = c(4, 5) ),
+            
+            nrow = 3, rel_heights = c(1, 1, .7), labels = c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;), label_size = 17
+  )
+}</code></pre>
+<pre class="r"><code># Make sure the compound names present correctly and professionaly
+func.tidyFeatureNames = function(vector){
+  
+  vector = vector %&gt;% str_replace(pattern = DOT, replacement = &quot; &quot;)
+
+  if (vector == &quot;X3 4.di.HBA&quot;) {return(&quot;3,4-diHBA&quot;)
+  } else if (vector == &quot;X3 HBA&quot;) { return(&quot;3-HBA&quot;)
+  } else if (vector == &quot;p Coumaric.acid&quot;) { return(&quot;p-Coumaric acid&quot;)
+  } else if (vector == &quot;X4 HBA&quot;) {return(&quot;4-HBA&quot;)
+  } else if (vector == &quot;glucose fructose&quot;) { return(&quot;Glucose &amp; Fructose&quot;)
+  }
+  
+  return(vector)
+}</code></pre>
+<pre class="r"><code>for(i in 1:length(lemonFeatures)){
+  
+  # Feature title
+  title_theme = ggplot() + 
+    geom_text(aes(x = .5, y = .5, 
+                  # due to standardized column names, compounds starting with numbers e.g. 3-HBA will start with X
+                  # remove that X!
+                  label = lemonFeatures[i] %&gt;% func.tidyFeatureNames(), 
+              size = 10, fontface = &quot;bold&quot;)) + 
+    theme_void()
+    
+    plt = func.plt.ICE.modelComparison.distribution(featureCode = i)
+  
+  space = ggplot() + theme_void()
+  
+  plot_grid(title_theme, plt, space, rel_heights = c(.5, 10, 2), nrow = 3) %&gt;%
+    # print is needed to show the plot
+    print()
+  
+}</code></pre>
+<p><strong>The plotting results are separately shown in the second tab. </strong></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

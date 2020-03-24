@@ -3,7 +3,7 @@ navbar:
   title: ""
   left:
     - text: "Home"
-      href: cover.html
+      href: index.html
     - text: "ICE plots"
       href: ICEplots.html
     - text: "R Script"
