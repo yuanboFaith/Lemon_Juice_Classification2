@@ -361,7 +361,10 @@ div.tocify {
   <a href="ICEplots.html">ICE plots</a>
 </li>
 <li>
-  <a href="LemonMLscript.html">R Script</a>
+  <a href="LemonMLscript.html">Machine Learning Script</a>
+</li>
+<li>
+  <a href="Shiny_App_Script.html">Shiny App Script</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -515,8 +518,8 @@ plot_ly(PC, x = ~ PC1, y =  ~PC2, z =  ~PC3, color = ~ type) %&gt;%
            zaxis = list(title = paste0(&quot;PC3, &quot;, round(eigen.values[3]/sum(eigen.values)* 100, 1), &quot;% explained&quot;))
          )
   )</code></pre>
-<div id="htmlwidget-5f92e833e5f1a9a10f34" style="width:768px;height:768px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-5f92e833e5f1a9a10f34">{"x":{"visdat":{"149734a4228a0":["function () ","plotlyVisDat"]},"cur_data":"149734a4228a0","attrs":{"149734a4228a0":{"x":{},"y":{},"z":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Interactive PCA","scene":{"xaxis":{"title":"PC1, 35.9% explained"},"yaxis":{"title":"PC2, 14.8% explained"},"zaxis":{"title":"PC3, 9.6% explained"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[2.16937890399153,1.91040110116648,1.73221609775543,1.17409021885505,-0.152810861888566,-2.77565576208736,0.722499018998943,-1.20627984740878,-1.93122000073008,-3.1998142506024,-2.91048610751429,-4.3598441953108,-0.864027408055558,-1.74786060716305,-1.94252884556735,-2.67962802442246,-3.15358925372303,2.02343716994806,-1.81916021687553,0.495095010615543,1.98993932127347,-0.266874177285252,0.640533422479092,1.98227516919192,-0.936599633956021,1.21521316995854,2.20681874569683,-1.69776657154801,0.429424810637125,1.88438413892544,-1.04678675944628,1.21178294735348,1.87946551113415,0.304845543706161,1.25227816125772,1.68166045692548],"y":[-0.658848045149263,-0.570935788341447,0.279712723268497,1.03059252962476,1.19419472565614,-3.69838690851849,1.52890157579717,2.36787722609301,2.65702938898717,2.31350201956368,2.2228264387465,2.0984469015658,3.28138990409283,3.49790347290262,3.10247632700314,2.62100094475333,1.82881405309405,-0.702774095542958,-2.84528951732795,0.181301846302691,-0.369267954510674,-1.75912024221848,0.0103710592361301,-0.339145113195276,-2.34936387065743,-0.124719566772218,-0.742423392014647,-3.16939115449346,-0.630269315863172,-0.621821127154626,-2.4791872736323,-0.0431198866705049,-0.131770434248737,-1.21604297905936,0.0395814373344747,0.603866378701767],"z":[-2.34480231778391,-1.48772010112747,-0.0664154067536629,0.198808796095033,1.32445580763647,-3.98764175084739,-0.476686544791779,-1.18923304921537,-0.850817517476233,-1.49126982123039,-1.55104397965071,-0.76386539880732,-0.707437499175226,-0.77549451816468,-1.05114694936007,-1.47700866911456,-0.436445552207564,-2.42409139119584,0.0528611176700419,-0.284881992020533,-2.21011066538489,0.192731310880614,0.129791548327964,-1.88150157195009,-0.232949319195479,0.79270784099746,-2.44483742830136,0.131294520704453,0.983512416012826,-1.3330038314345,0.0152601375277107,-0.0244703954086118,-1.76321272916386,-0.100619894487396,0.619932313614336,-0.0725424907837826],"type":"scatter3d","mode":"markers","name":"adulterated","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[1.01291888861507,0.467017620477701,1.08770193971381,-1.82252151547724,-0.0810594486462886,-1.2861435265349,-1.58337329601281,-5.79864711076063,-3.33174891166321,-5.4136870450468,-4.73765312586172,-6.69212394121198,-2.69752283619741,-1.78353553981187,-1.73677957338868,-2.38993482968795,-4.11680737531645,-1.16195413265596,0.506739269540331,-3.48009970882152,-0.376203414422354,-0.857598843272268,-1.83883839861107,0.74165954595812,-0.483336213686286,-0.837543346658189],"y":[0.169080929169469,0.158594341647139,0.612790925478432,0.330364090346352,0.849857336122177,0.420829674761175,0.185487991847175,-3.46629168307858,0.884970670884727,0.104153973985505,-2.78872554651875,-0.509753102437503,-1.37106595074677,-0.846144028623397,-0.476804903415557,-1.60685846193281,-0.806175321541067,0.398937905462601,0.603424819189591,0.534784578152911,0.972466212708072,-0.133406012583611,0.840472525659368,1.54179924537503,1.93220898225058,-1.01661683207685],"z":[0.830633678003543,0.950778721336475,0.627451596375145,2.01936685595534,1.39320085927018,1.32853220505203,1.30822664312303,0.302118087831581,1.69711392323811,1.54801778746243,0.457511416535522,-1.26844409195779,-0.674147572053593,-0.513832701768764,-0.253922198262404,0.921172512589743,-0.603020914492413,0.526093381610655,0.922606724473602,0.827893426285318,1.24075498108795,0.309405709839211,0.494844601168968,0.177126990631499,-0.0348071338903448,3.76743718992213],"type":"scatter3d","mode":"markers","name":"authentic","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[1.89232730615552,2.31625197081297,1.94393216636709,2.34865446086109,1.59293606077308,2.28848462782354,2.3066709029764,2.21854726758332,2.15878700617488,1.4656066349957,1.84789664963087,1.98050000431801,2.11417896993608,1.92511528500568,1.90898306379699,2.10910726441007,2.75198112189348,2.12520705223765,1.35976192555562,1.52397032649843,1.80403923964429,2.22756214659047,1.8542779384242,2.16467424101417,2.3541295612516,1.08529816975419,2.23861826953206,0.568768839137491],"y":[0.710448807271158,0.273696215566772,-0.733825165265762,0.641869477837081,-0.0935756718069633,1.01880950381587,0.155548305421993,0.66196106476181,0.726054333896771,-0.234591418650171,-0.473872699375168,0.200761685053095,0.370499665323442,-0.546162434730461,0.273898390721125,0.211214336229166,-1.01666608506747,0.597693203773363,-0.990733535829335,-0.824011044855591,-0.100157127138289,-0.444780818660945,-0.579827665813346,-0.34521607208014,-0.52480404199934,-2.28599043822512,-0.0628289610638123,-2.51170645654788],"z":[0.194182681224529,0.447745333699579,-0.328865970554087,-0.351341081414347,0.646267678203908,-0.602682448547042,0.529470397788582,0.393436242354996,0.266598152217312,0.90964172775609,1.13633230253395,0.933711245781841,0.387333762059552,0.489599465323024,0.783771414015199,0.59322518337101,-2.30291766475496,0.345297294954782,0.867489327691676,1.48048798956673,0.577424329583108,-0.02204326191445,0.530765010114453,0.578980134288455,-0.356071526981903,0.362070429497829,0.755477085176392,-0.559602936837571],"type":"scatter3d","mode":"markers","name":"commercial","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-a680a1fcd62a0dd1ba32" style="width:768px;height:768px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a680a1fcd62a0dd1ba32">{"x":{"visdat":{"15cf5450fc856":["function () ","plotlyVisDat"]},"cur_data":"15cf5450fc856","attrs":{"15cf5450fc856":{"x":{},"y":{},"z":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Interactive PCA","scene":{"xaxis":{"title":"PC1, 35.9% explained"},"yaxis":{"title":"PC2, 14.8% explained"},"zaxis":{"title":"PC3, 9.6% explained"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[2.16937890399153,1.91040110116648,1.73221609775543,1.17409021885505,-0.152810861888566,-2.77565576208736,0.722499018998943,-1.20627984740878,-1.93122000073008,-3.1998142506024,-2.91048610751429,-4.3598441953108,-0.864027408055558,-1.74786060716305,-1.94252884556735,-2.67962802442246,-3.15358925372303,2.02343716994806,-1.81916021687553,0.495095010615543,1.98993932127347,-0.266874177285252,0.640533422479092,1.98227516919192,-0.936599633956021,1.21521316995854,2.20681874569683,-1.69776657154801,0.429424810637125,1.88438413892544,-1.04678675944628,1.21178294735348,1.87946551113415,0.304845543706161,1.25227816125772,1.68166045692548],"y":[-0.658848045149263,-0.570935788341447,0.279712723268497,1.03059252962476,1.19419472565614,-3.69838690851849,1.52890157579717,2.36787722609301,2.65702938898717,2.31350201956368,2.2228264387465,2.0984469015658,3.28138990409283,3.49790347290262,3.10247632700314,2.62100094475333,1.82881405309405,-0.702774095542958,-2.84528951732795,0.181301846302691,-0.369267954510674,-1.75912024221848,0.0103710592361301,-0.339145113195276,-2.34936387065743,-0.124719566772218,-0.742423392014647,-3.16939115449346,-0.630269315863172,-0.621821127154626,-2.4791872736323,-0.0431198866705049,-0.131770434248737,-1.21604297905936,0.0395814373344747,0.603866378701767],"z":[-2.34480231778391,-1.48772010112747,-0.0664154067536629,0.198808796095033,1.32445580763647,-3.98764175084739,-0.476686544791779,-1.18923304921537,-0.850817517476233,-1.49126982123039,-1.55104397965071,-0.76386539880732,-0.707437499175226,-0.77549451816468,-1.05114694936007,-1.47700866911456,-0.436445552207564,-2.42409139119584,0.0528611176700419,-0.284881992020533,-2.21011066538489,0.192731310880614,0.129791548327964,-1.88150157195009,-0.232949319195479,0.79270784099746,-2.44483742830136,0.131294520704453,0.983512416012826,-1.3330038314345,0.0152601375277107,-0.0244703954086118,-1.76321272916386,-0.100619894487396,0.619932313614336,-0.0725424907837826],"type":"scatter3d","mode":"markers","name":"adulterated","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[1.01291888861507,0.467017620477701,1.08770193971381,-1.82252151547724,-0.0810594486462886,-1.2861435265349,-1.58337329601281,-5.79864711076063,-3.33174891166321,-5.4136870450468,-4.73765312586172,-6.69212394121198,-2.69752283619741,-1.78353553981187,-1.73677957338868,-2.38993482968795,-4.11680737531645,-1.16195413265596,0.506739269540331,-3.48009970882152,-0.376203414422354,-0.857598843272268,-1.83883839861107,0.74165954595812,-0.483336213686286,-0.837543346658189],"y":[0.169080929169469,0.158594341647139,0.612790925478432,0.330364090346352,0.849857336122177,0.420829674761175,0.185487991847175,-3.46629168307858,0.884970670884727,0.104153973985505,-2.78872554651875,-0.509753102437503,-1.37106595074677,-0.846144028623397,-0.476804903415557,-1.60685846193281,-0.806175321541067,0.398937905462601,0.603424819189591,0.534784578152911,0.972466212708072,-0.133406012583611,0.840472525659368,1.54179924537503,1.93220898225058,-1.01661683207685],"z":[0.830633678003543,0.950778721336475,0.627451596375145,2.01936685595534,1.39320085927018,1.32853220505203,1.30822664312303,0.302118087831581,1.69711392323811,1.54801778746243,0.457511416535522,-1.26844409195779,-0.674147572053593,-0.513832701768764,-0.253922198262404,0.921172512589743,-0.603020914492413,0.526093381610655,0.922606724473602,0.827893426285318,1.24075498108795,0.309405709839211,0.494844601168968,0.177126990631499,-0.0348071338903448,3.76743718992213],"type":"scatter3d","mode":"markers","name":"authentic","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[1.89232730615552,2.31625197081297,1.94393216636709,2.34865446086109,1.59293606077308,2.28848462782354,2.3066709029764,2.21854726758332,2.15878700617488,1.4656066349957,1.84789664963087,1.98050000431801,2.11417896993608,1.92511528500568,1.90898306379699,2.10910726441007,2.75198112189348,2.12520705223765,1.35976192555562,1.52397032649843,1.80403923964429,2.22756214659047,1.8542779384242,2.16467424101417,2.3541295612516,1.08529816975419,2.23861826953206,0.568768839137491],"y":[0.710448807271158,0.273696215566772,-0.733825165265762,0.641869477837081,-0.0935756718069633,1.01880950381587,0.155548305421993,0.66196106476181,0.726054333896771,-0.234591418650171,-0.473872699375168,0.200761685053095,0.370499665323442,-0.546162434730461,0.273898390721125,0.211214336229166,-1.01666608506747,0.597693203773363,-0.990733535829335,-0.824011044855591,-0.100157127138289,-0.444780818660945,-0.579827665813346,-0.34521607208014,-0.52480404199934,-2.28599043822512,-0.0628289610638123,-2.51170645654788],"z":[0.194182681224529,0.447745333699579,-0.328865970554087,-0.351341081414347,0.646267678203908,-0.602682448547042,0.529470397788582,0.393436242354996,0.266598152217312,0.90964172775609,1.13633230253395,0.933711245781841,0.387333762059552,0.489599465323024,0.783771414015199,0.59322518337101,-2.30291766475496,0.345297294954782,0.867489327691676,1.48048798956673,0.577424329583108,-0.02204326191445,0.530765010114453,0.578980134288455,-0.356071526981903,0.362070429497829,0.755477085176392,-0.559602936837571],"type":"scatter3d","mode":"markers","name":"commercial","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="lda-full-data" class="section level2">
 <h2><span class="header-section-number">3.4</span> LDA (full data)</h2>
@@ -757,16 +760,16 @@ d.tune.svm.radial</code></pre>
 ## # Groups:   gamma [17]
 ##     gamma     cost accuracy.mean accuracy.sd
 ##     &lt;dbl&gt;    &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1 0.1        10            89.2        8.77
-##  2 0.0316     10            87.7       14.0 
-##  3 0.1        31.6          87.7        8.77
-##  4 0.1       100            87.7        8.77
-##  5 0.1       316.           87.7        8.77
-##  6 0.1      1000            87.7        8.77
-##  7 0.1      3162.           87.7        8.77
-##  8 0.1     10000            87.7        8.77
-##  9 0.1     31623.           87.7        8.77
-## 10 0.1    100000            87.7        8.77
+##  1 0.0316    10             93.8        3.44
+##  2 0.0316    31.6           92.3        5.44
+##  3 0.0316     3.16          90.8        6.44
+##  4 0.1        3.16          90.8        6.44
+##  5 0.0316   100             89.2        4.21
+##  6 0.0316   316.            89.2        4.21
+##  7 0.0316  1000             89.2        4.21
+##  8 0.0316  3162.            89.2        4.21
+##  9 0.0316 10000             89.2        4.21
+## 10 0.0316 31623.            89.2        4.21
 ## # … with 245 more rows</code></pre>
 <pre class="r"><code># Func. def: plotting SVM hyper-parameter tuning result
 func.plot.tune.HyperParam = function( data, hyper1, hyper2){ 
@@ -815,18 +818,18 @@ d.tune.svm.polynomial = d.CV.SVM.polynomial %&gt;%
 d.tune.svm.polynomial</code></pre>
 <pre><code>## # A tibble: 90 x 4
 ## # Groups:   degree [6]
-##    degree     cost accuracy.mean accuracy.sd
-##     &lt;int&gt;    &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1      3    100            81.5        8.77
-##  2      3    316.           81.5        8.77
-##  3      3   1000            81.5        8.77
-##  4      3   3162.           81.5        8.77
-##  5      3  10000            81.5        8.77
-##  6      3  31623.           81.5        8.77
-##  7      3 100000            81.5        8.77
-##  8      3     31.6          80         10.3 
-##  9      5  10000            78.5       15.8 
-## 10      5  31623.           78.5       15.8 
+##    degree    cost accuracy.mean accuracy.sd
+##     &lt;int&gt;   &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+##  1      3    100           84.6        9.42
+##  2      3    316.          84.6        9.42
+##  3      3   1000           84.6        9.42
+##  4      3   3162.          84.6        9.42
+##  5      3  10000           84.6        9.42
+##  6      3  31623.          84.6        9.42
+##  7      3 100000           84.6        9.42
+##  8      3     10           83.1       10.0 
+##  9      5    316.          83.1       11.4 
+## 10      5   1000           83.1       11.4 
 ## # … with 80 more rows</code></pre>
 <pre class="r"><code># plot tune result of polynomial kernel
 plt.svm.tune.polynomial = 
@@ -859,21 +862,21 @@ d.tune.svm.linear</code></pre>
 <pre><code>## # A tibble: 15 x 3
 ##           cost accuracy.mean accuracy.sd
 ##          &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1      0.316           84.6       12.2 
-##  2      1               83.1       14.8 
-##  3      0.1             81.5       16.0 
-##  4    316.              80          8.77
-##  5   1000               80          8.77
-##  6   3162.              80          8.77
-##  7  10000               80          8.77
-##  8  31623.              80          8.77
-##  9 100000               80          8.77
-## 10     10               78.5        6.44
-## 11     31.6             78.5        6.44
-## 12    100               78.5        6.44
-## 13      3.16            78.5       10.0 
-## 14      0.0316          73.8        6.88
-## 15      0.01            47.7       23.3</code></pre>
+##  1    100               83.1        8.43
+##  2    316.              83.1        8.43
+##  3   1000               83.1        8.43
+##  4   3162.              83.1        8.43
+##  5  10000               83.1        8.43
+##  6  31623.              83.1        8.43
+##  7 100000               83.1        8.43
+##  8      1               83.1       10.0 
+##  9      3.16            83.1        6.44
+## 10     10               81.5        4.21
+## 11     31.6             80.0        4.21
+## 12      0.316           78.5       10.0 
+## 13      0.1             73.8       14.0 
+## 14      0.0316          69.2       15.4 
+## 15      0.01            56.9       12.9</code></pre>
 <pre class="r"><code>d.tune.svm.linear %&gt;% ggplot(aes(x = cost, y = accuracy.mean)) + 
   geom_bar(stat = &quot;identity&quot;, alpha = .8) + geom_point() + geom_line() + 
   scale_x_log10() </code></pre>
@@ -886,9 +889,9 @@ rbind(k1, k2, k3)</code></pre>
 <pre><code>## # A tibble: 3 x 3
 ##   accuracy.mean accuracy.sd kernel    
 ##           &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;     
-## 1          89.2        8.77 radial    
-## 2          81.5        8.77 polynomial
-## 3          84.6       12.2  linear</code></pre>
+## 1          93.8        3.44 radial    
+## 2          84.6        9.42 polynomial
+## 3          83.1        8.43 linear</code></pre>
 <pre class="r"><code># radial kernel renders the best cross-validation result up to 90.4 (sd 6.08) % overal accuracy, with hyper-parameter gamma 0.1 and cost 10. Linear kernel gives 82.1% accuracy. Polynomial with optimal degree 3 achieved 82.4% accuracy. Both linear and polynomial kernel generated much higher validation standard deviation.
 
 cv.svm = k1 %&gt;% mutate(model = &quot;SVM&quot;)</code></pre>
@@ -905,7 +908,7 @@ cat(&quot;Accuracy on the training set is&quot;, accuracy.training.svm, &quot;%.
 <pre><code>## Accuracy on the training set is 93.84615 %.</code></pre>
 <pre class="r"><code>accuracy.testing.svm = sum(predict(mdl.svm, newdata = testingSet.scaled) == testingSet.scaled$type) / nrow(testingSet.scaled) *100
 cat(&quot;Accuracy on the testing set is&quot;, accuracy.testing.svm, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the testing set is 80 %.</code></pre>
+<pre><code>## Accuracy on the testing set is 76 %.</code></pre>
 <pre class="r"><code># confusion matrix
 predict.SVM = predict(mdl.svm, newdata = testingSet.scaled)
 
@@ -941,7 +944,7 @@ mdl.lda = lda(data = trainingSet.scaled, type ~., prior = rep(1/3, 3))
 # Prediction on the training set
 accuracy.training.LDA = sum(predict(mdl.lda)$class == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
 cat(&quot;Accuracy on the training set by Linear Discriminant Analysis is&quot;, accuracy.training.LDA, &quot;%.&quot; )</code></pre>
-<pre><code>## Accuracy on the training set by Linear Discriminant Analysis is 87.69231 %.</code></pre>
+<pre><code>## Accuracy on the training set by Linear Discriminant Analysis is 86.15385 %.</code></pre>
 <pre class="r"><code># Prediction on the testing set 
 fitted.lda = predict(mdl.lda, newdata = testingSet.scaled)
 predict.LDA = fitted.lda$class
@@ -951,7 +954,7 @@ cf.lda = table(predict.LDA, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.lda = sum(predict(mdl.lda, newdata = testingSet.scaled)$class == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the testing set by Linear Discriminant Analysis is&quot;, accuracy.testing.lda, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the testing set by Linear Discriminant Analysis is 64 %.</code></pre>
+<pre><code>## Accuracy on the testing set by Linear Discriminant Analysis is 72 %.</code></pre>
 <pre class="r"><code># probability distribution sample-wise
 d.prob.lda = fitted.lda$posterior %&gt;% as_tibble() %&gt;% mutate(model = &quot;LDA&quot;)</code></pre>
 </div>
@@ -989,16 +992,16 @@ d.tune.RF</code></pre>
 ## # Groups:   trees [10]
 ##    trees features accuracy.mean accuracy.sd
 ##    &lt;dbl&gt;    &lt;int&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1   100        3          86.2        8.43
-##  2   200        3          86.2        8.43
-##  3   300        2          86.2        8.43
-##  4   500        2          86.2        8.43
-##  5   500        3          86.2        8.43
-##  6   500        4          86.2        8.43
-##  7   600        3          86.2        8.43
-##  8   600        4          86.2        8.43
-##  9   600        5          86.2        8.43
-## 10   700        4          86.2        8.43
+##  1   400        5          92.3        5.44
+##  2  1000        3          92.3        5.44
+##  3   100        3          90.8        8.43
+##  4   100        4          90.8        3.44
+##  5   100        5          90.8        8.43
+##  6   200        3          90.8        8.43
+##  7   200        4          90.8        8.43
+##  8   300        2          90.8        8.43
+##  9   300        3          90.8        8.43
+## 10   300        5          90.8        8.43
 ## # … with 60 more rows</code></pre>
 <pre class="r"><code>plt.RF.tune = d.tune.RF %&gt;% 
   func.plot.tune.HyperParam(hyper1 = &quot;trees&quot;, hyper2 = &quot;features&quot;) +
@@ -1028,7 +1031,7 @@ cf.RF = table(predict.RF, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.RF = sum(predict.RF == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the testing set using Random Forest is&quot;, accuracy.testing.RF, &quot;%&quot;) </code></pre>
-<pre><code>## Accuracy on the testing set using Random Forest is 84 %</code></pre>
+<pre><code>## Accuracy on the testing set using Random Forest is 80 %</code></pre>
 <pre class="r"><code># Probability distribution of predicted test set
 d.prob.RF = predict(mdl.rf, testingSet.scaled, type = &quot;prob&quot;) %&gt;%
   as_tibble() %&gt;%
@@ -1058,7 +1061,7 @@ mdl.nb = naiveBayes(x = trainingSet.scaled[, -1],
 
 accuracy.training.NB = sum(predict(mdl.nb, newdata = trainingSet.scaled[, -1]) == trainingSet.scaled$type)/nrow(trainingSet.scaled) * 100
 cat(&quot;Accuracy on the training set using Naive Bayes is&quot;, accuracy.training.NB, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the training set using Naive Bayes is 90.76923 %.</code></pre>
+<pre><code>## Accuracy on the training set using Naive Bayes is 86.15385 %.</code></pre>
 <pre class="r"><code>predict.NB = predict(mdl.nb, testingSet.scaled[, -1])
 
 cf.NB = table(predict.NB, testingSet.scaled$type) %&gt;% 
@@ -1066,7 +1069,7 @@ cf.NB = table(predict.NB, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.NB = sum(predict.NB == testingSet.scaled$type)/nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the testing set using Naive Bayes is&quot;, accuracy.testing.NB, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the testing set using Naive Bayes is 72 %.</code></pre>
+<pre><code>## Accuracy on the testing set using Naive Bayes is 84 %.</code></pre>
 <pre class="r"><code>d.prob.NB = predict(mdl.nb, testingSet.scaled[, -1], type = &quot;raw&quot;)  %&gt;%
   as_tibble() %&gt;% mutate(model = &quot;NB&quot;)
 # d.prob.NB</code></pre>
@@ -1104,7 +1107,7 @@ fitted.softmax.train = predict(softmax.cv, newx = trainingSet.scaled[, -1] %&gt;
 
 accuracy.training.LR = sum(fitted.softmax.train == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
 cat(&quot;Accuracy on the training set using lasso-regularized softmax regression is&quot;, accuracy.training.LR, &quot;%.&quot;) </code></pre>
-<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 89.23077 %.</code></pre>
+<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 87.69231 %.</code></pre>
 <pre class="r"><code># Prediction on the testing set
 predict.softmax = predict(softmax.cv, newx = testingSet.scaled[, -1] %&gt;% as.matrix(),
                           s = softmax.cv$lambda.1se, type = &quot;class&quot;) %&gt;% c()
@@ -1114,12 +1117,12 @@ cf.LR = table(predict.softmax, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.LR = sum(predict.softmax == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the training set using lasso-regularized softmax regression is&quot;, accuracy.testing.LR, &quot;%.&quot;) </code></pre>
-<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 76 %.</code></pre>
+<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 80 %.</code></pre>
 <pre class="r"><code>table(predict.softmax, testingSet.scaled$type)</code></pre>
 <pre><code>##                
 ## predict.softmax adulterated authentic commercial
-##     adulterated           6         1          1
-##     authentic             3         6          0
+##     adulterated           8         2          1
+##     authentic             1         5          0
 ##     commercial            1         0          7</code></pre>
 <pre class="r"><code># Predicted probability distribution on the test set
 d.prob.LR = predict(softmax.cv, newx = testingSet.scaled[, -1] %&gt;% as.matrix(),

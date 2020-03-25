@@ -1,0 +1,343 @@
+---
+title: "Shiny App Script"
+author: "Bo Yuan"
+date: "3/25/2020"
+output: html_document
+---
+
+```{r, eval=F, message=FALSE, warning=F}
+# Shiny packages
+library(shiny)
+library(DT)
+library(rdrop2)
+
+# general function
+library(readxl)
+library(rebus)
+library(stringr)
+library(gridExtra)
+library(cowplot)
+library(RColorBrewer)
+
+# machine learning packages
+library(glmnet)
+library(MASS)
+library(e1071)
+library(rsample)
+library(randomForest)
+
+# finally load tidyverse avoiding key functions from being masked
+library(tidyverse)
+
+
+
+
+# Import data from Dropbox --------
+drop_auth()
+token = drop_auth()
+saveRDS(token, file = "token.rds")
+
+d = drop_read_csv(file = "Shiny lemon final data_CLEANED UP.csv") 
+
+# check extreme values of original data
+# d[, -c(1:4)]  %>% apply(2, min)
+# d[, -c(1:4)]  %>% apply(2, max)
+
+
+# Global color set
+Pastel1 = brewer.pal(9, "Pastel1")
+color.types = Pastel1[1:3]
+names(color.types) = c("adulterated", "authentic", "commercial")
+
+
+
+# normalize training set (entire dataset)
+d.contentOnly = d %>% select(-c(code, Sample, type, character))
+d.scaled = cbind(type = d$type, d.contentOnly %>% scale() %>% as_tibble()) %>% as_tibble()
+vector.mean = apply(d.contentOnly, 2, mean)
+vector.std =  apply(d.contentOnly, 2, sd)
+
+
+
+
+# MODELS -----
+# Linear Discriminant Analysis (LDA) 
+mdl.lda = lda(data = d.scaled, type ~., prior = rep(1/3, 3))
+
+fitted.lda = predict(mdl.lda, newdata = newSample.scaled)
+fitted.label.lda = fitted.lda$class
+fitted.prob.lda = fitted.lda$posterior
+
+
+
+# Support vector machine (SV) 
+# tune.svm = tune.svm(x = d.scaled[, -1], y = d.scaled$type, 
+#                     kernel = "radial", type = "C-classification",
+#                     gamma = 10^(seq(-4, 4, by = .5)), cost = 10^(seq(-4, 4, by = .5)))
+# bestGamma = tune.svm$best.parameters$gamma
+# bestCost = tune.svm$best.parameters$cost
+
+mdl.svm = svm(data = d.scaled, type ~., 
+              gamma = .1, cost = 10, # best parameter tuned as above
+              kernel = "radial", type = "C-classification")
+
+
+
+
+
+# Random forest (RF) 
+# cv.rf = d.scaled %>% vfold_cv(v = 6, strata = "type") %>%
+#   mutate(train = map(.x = splits, .f = ~training(.x)),
+#          validate = map(.x = splits, .f = ~testing(.x))) %>% 
+#   select(-splits) %>%
+#   crossing(ntree = seq(400, 1000, by = 200), mtry = 2:6) %>%
+#   mutate(param = map2(.x = ntree, .y = mtry, .f = ~list(.x, .y))) %>% # ntree 1st; mtry 2nd
+#   mutate(model = map2(.x = train, .y = param, 
+#                       .f = ~randomForest(x = .x[, -1], y = .x[[1]], ntree = .y[[1]], mtry = .y[[2]]  ))) %>%
+#   mutate(fitted.validate = map2(.x = model, .y = validate, 
+#                                 .f = ~ predict(.x, .y, type = "response")  )) %>%
+#   mutate(actual.validate = map(.x = validate, .f = ~ .x[[1]])) %>%
+#   mutate(accuracy = map2_dbl(.x = fitted.validate, .y = actual.validate, 
+#                          .f = ~ sum(.x == .y) / length(.x) ))
+#   
+# cv.summary = cv.rf %>% group_by(ntree, mtry) %>%
+#   summarise(accuracy.mean = mean(accuracy),
+#             accuracy.sd = sd(accuracy)) %>%
+#   arrange(desc(accuracy.mean) ) 
+
+# 0.86 ~ 0.88, accuracy is much close, actually not significantly different
+
+mdl.rf = randomForest(x = d.scaled[, -1], y = d.scaled$type, ntree = 400, mtry = 2)
+
+
+
+
+# Naive Bayes
+# Set up model on entire training set
+mdl.nb = naiveBayes(x = d.scaled[, -1], 
+                    y = d.scaled$type %>% as.factor(), # y has to be factor 
+                    prior = c(1/3, 1/3, 1/3)) 
+
+
+
+
+
+# regularized logistic (softmax) regression
+# cross validation to check model performance. 
+# mdl.lg.cv = cv.glmnet(x = d.scaled[, -1] %>% as.matrix(), 
+#                       y = d.scaled$type, family = "multinomial", alpha = 1)
+# plot(mdl.lg.cv)
+
+# mdl.lg.cv$lambda.1se being 0.07898059; could change slightly due to randomization of cross-validation folds
+mdl.lr = glmnet(x = d.scaled[, -1] %>% as.matrix(), y = d.scaled$type,
+                lambda = 0.07898059,  family = "multinomial", alpha = 1)
+
+
+
+
+
+
+# Define UI -----
+ui <- fluidPage(
+    
+    br(),
+    # Application title
+    strong("Lemon Juice Classification with Machine Learning", style = "font-size:200%;"),
+    
+    br(),
+    
+    
+    # Sidebar with a slider input for number of bins 
+    sidebarLayout(
+        sidebarPanel(
+            
+            strong(see [construction script](https://boyuan.shinyapps.io/CatnipQC/) ),
+                
+                # strong("Organic acids", style = "color:orange; font-size: 120%;"),
+                fluidRow(column(4, sliderInput("Citric.acid", "Citric acid", min = 0, max = 200, value = 12.97)),
+                         column(4, sliderInput("Malic.acid", "Malic acid", min = 0, max = 60, value = 6.52)),
+                         column(4, sliderInput("Ascorbic.acid", "Ascorbic acid", min = 0, max = 15, value = 0.07))),
+            
+            
+            
+            # strong("Saccharides", style = "color:orange; font-size: 120%;"),
+            fluidRow(column(4, sliderInput("Sucrose", "Sucrose", min = 0, max = 400, value = 12.7)),
+                     column(4, sliderInput("glucose.fructose", "Glu/Fructose", min = 0, max = 600, value = 35.02))),
+            
+            
+            
+            # strong("Phenolic acids", style = "color:orange; font-size: 120%;"),
+            
+            fluidRow(column(4, sliderInput("X3.4.di.HBA", "3, 4-diHBA", min = 0, max = 800, value = 92.14)),
+                     column(4, sliderInput("X3.HBA", "3-HBA", min = 0, max = 2000, value = 7.92)),
+                     column(4, sliderInput("Caffeic.acid", "Caffeic acid", min = 0, max = 300, value = 0))),
+            
+            fluidRow(column(4, sliderInput("X4.HBA", "4-HBA", min = 0, max = 150, value = 40.17)),
+                     column(4, sliderInput("p.Coumaric.acid", "Coumaric acid", min = 0, max = 3000, value = 13.24)),
+                     column(4, sliderInput("Ferulic.acid", "Ferulic acid", min = 0, max = 1200, value = 17.91))),
+            
+            
+            
+            # strong("Assays", style = "color:orange; font-size: 120%;"),
+            
+            fluidRow(column(4, sliderInput("TPP.test", "TPP test", min = 0, max = 15, value = 1.06)),
+                     column(4, sliderInput("Antioxidant.test", "Folin's test", min = 0, max = 15, value = 3.3)),
+                     column(4, sliderInput("FRAP.test", "FRAP test", min = 0, max = 10, value = 0.37))),
+            
+            
+            # strong("Model names are abbreviated as acronyms:"), br(), 
+            span(strong("LDA"), ", Linear Discriminant Analysis"), br(),br(),
+            span(strong("LR"), ", Logistic (softmax) regression, lasso-regularized"), br(),br(),
+            span(strong("NB"), ", Naive Bayes"), br(),br(),
+            span(strong("RF"), "Random Forest"), br(),br(),
+            span(strong("SVM"), ", Support Vector Machine"), br(),br()
+            
+        ),
+        
+        # Show a plot of the generated distribution
+        mainPanel(
+            plotOutput("plt.singleSampleFitted", height = 500)
+        )
+    )
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+    
+    # SINGLE SAMPLE PREDICTION
+    
+    output$plt.singleSampleFitted = renderPlot({
+        
+        # read user input data \
+        newSample = data.frame(
+            # Organic acids
+            Citric.acid = input$Citric.acid, Malic.acid = input$Malic.acid, Ascorbic.acid = input$Ascorbic.acid,
+            
+            # Saccharides
+            Sucrose = input$Sucrose, glucose.fructose = input$glucose.fructose,
+            
+            # Fenolic acids
+            X3.4.di.HBA = input$X3.4.di.HBA, X3.HBA = input$X3.HBA, Caffeic.acid = input$Caffeic.acid,
+            X4.HBA = input$X4.HBA, p.Coumaric.acid = input$p.Coumaric.acid, Ferulic.acid = input$Ferulic.acid,
+            
+            # Assays
+            TPP.test = input$TPP.test, Antioxidant.test = input$Antioxidant.test, FRAP.test = input$FRAP.test
+        )
+        
+        newSample.scaled = newSample %>% scale(center = vector.mean, scale = vector.std) %>% as_tibble()
+        
+        
+        # ALL model results 
+        
+        # LDA
+        fitted.label.svm = predict(mdl.svm, newdata = newSample.scaled)
+        # RF
+        fitted.label.rf = predict(mdl.rf, newSample.scaled, type = "response")
+        fitted.prob.rf =  predict(mdl.rf, newSample.scaled, type = "prob")
+        # NB
+        fitted.label.nb  = predict(mdl.nb, newdata = newSample.scaled)
+        fitted.prob.nb = predict(mdl.nb, newdata = newSample.scaled, type = "raw")
+        # LR
+        fitted.label.lr = predict(mdl.lr, newx = newSample.scaled %>% as.matrix(), type = "class")[[1]] 
+        fitted.prob.lr = predict(mdl.lr, newx = newSample.scaled %>% as.matrix(),
+                                 lambda = 0.07898059, type = "response")[, , 1] 
+        
+        # Summarize predicted label
+        d.fitted.label = data.frame(LDA =fitted.label.lda, NB = fitted.label.nb, LR = fitted.label.lr, 
+                                    RF = fitted.label.rf, SVM = fitted.label.svm) %>%
+            gather(key = model, value = fitted.Model)
+        
+        theme.pureText = theme_bw() + theme(axis.ticks = element_blank(),
+                                            axis.title.y = element_text(colour = "white"),
+                                            axis.text.y =  element_text(colour = "white"),
+                                            panel.grid = element_blank(),
+                                            panel.border = element_blank(),
+                                            axis.text.x = element_blank(),
+                                            axis.title.x = element_blank())
+        
+        # Fitted type resutls
+        plt.fitted.model =  d.fitted.label %>%
+            ggplot(aes(x = model, y = 1)) + 
+            geom_label(aes(label = fitted.Model, fill = fitted.Model), 
+                       size = 7, fontface = "bold",
+                       label.padding  = unit(.8, "lines"), label.size = unit(0, "lines")) + 
+            scale_fill_manual(values = color.types) +  theme.pureText + theme(legend.position = "none")
+        plt.fitted.model
+        
+        # Model names
+        plt.modleNames = d.fitted.label %>%
+            ggplot(aes(x = model, y = 1)) + 
+            geom_text(aes(label = model), size = 6, fontface = "bold") + theme.pureText
+        plt.modleNames
+        
+        # Combine model names and fitted resutls of a single new sample
+        plt.labels = plot_grid(plt.modleNames, plt.fitted.model, nrow = 2)
+        plt.labels
+        
+        
+        
+        # Summarize probability distribution
+        func.tidyFittedProb = function(dataset, modelName){
+            dataset %>% as_tibble() %>% 
+                mutate(Sample = 1:nrow(dataset)) %>% 
+                gather(1:3, key = fitted.type, value = fitted.prob) %>%
+                arrange(Sample) %>% 
+                mutate(model = modelName)
+        }
+        
+        
+        fitted.prob.lda = fitted.prob.lda %>% func.tidyFittedProb(modelName = "LDA")
+        fitted.prob.nb = fitted.prob.nb %>% func.tidyFittedProb(modelName = "NB")
+        fitted.prob.rf = fitted.prob.rf %>% func.tidyFittedProb(modelName = "RF")
+        fitted.prob.LR = tibble(Sample = 1, fitted.type = names(fitted.prob.lr), 
+                                fitted.prob = fitted.prob.lr, model = "LR")
+        
+        
+        fitted.prob =  rbind(fitted.prob.lda, fitted.prob.nb) %>% rbind(fitted.prob.rf) %>%
+            rbind(fitted.prob.LR)
+        
+        plt.prob = fitted.prob %>%
+            ggplot(aes(x = 1, y = fitted.prob, fill = fitted.type)) +
+            geom_bar(stat = "identity", position = "stack") +
+            facet_wrap(~model, nrow = 1) +
+            
+            scale_fill_manual(values = color.types) +
+            
+            geom_text(aes(label = round(fitted.prob, 2)), position = position_stack(.5), 
+                      color = "black", fontface = "bold", size = 5) +
+            theme(axis.text.x = element_blank(),
+                  axis.title.x = element_blank(),
+                  axis.ticks.x = element_blank(),
+                  
+                  axis.text.y = element_text(size = 14, color = "black"),
+                  axis.title.y = element_text(size = 15),
+                  
+                  panel.border = element_blank(),
+                  panel.grid = element_blank(),
+                  legend.title = element_blank(),
+                  strip.text = element_text(size = 17),
+                  
+                  legend.position = "bottom",
+                  legend.text = element_text(face = "bold", size = 14))  +
+            labs(y = "Probability\n") +
+            scale_y_continuous(breaks = seq(0, 1, by = .2))
+        
+        plt.prob  
+        
+        # White space
+        whiteSpace = ggplot() + theme_void()
+        
+        # Combine all plots
+        plt.singleSampleFitted = 
+            plot_grid(plt.labels, whiteSpace, plt.prob, nrow = 3, rel_heights = c(2, .6, 5),
+                      labels = c("A", "", "B"), label_size = 23, label_colour = "firebrick")
+        return(plt.singleSampleFitted)
+    })
+    
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
+
+```
+
