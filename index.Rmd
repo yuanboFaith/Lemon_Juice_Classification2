@@ -12,6 +12,6 @@ output:
 
 <br><br>
 
-<p style = "color: white; text-align:center; font-size: 120%;"> Welcome to visit <strong>[our laboratory.](http://newuseag.rutgers.edu/)</strong> </p> 
+<p style = "color: white; text-align:center; font-size: 120%;"> Learn more of <strong>[our laboratory and program.](http://newuseag.rutgers.edu/)</strong> </p> 
 
 <br>
