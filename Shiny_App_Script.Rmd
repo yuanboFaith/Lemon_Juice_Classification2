@@ -1,6 +1,5 @@
 ---
 title: "Shiny App Script"
-author: "Bo Yuan"
 date: "3/25/2020"
 output: html_document
 ---
