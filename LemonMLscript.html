@@ -421,12 +421,13 @@ theme_set(theme_bw() +
 
 # global color set
 color.types = c(&quot;firebrick&quot;, &quot;steelblue&quot;, &quot;darkgreen&quot;)
-names(color.types) = c(&quot;adulterated&quot;, &quot;authentic&quot;, &quot;commercial&quot;)</code></pre>
+names(color.types) = c(&quot;adulterated_L_J&quot;, &quot;authentic_L_J&quot;, &quot;lemonade&quot;)</code></pre>
 </div>
 <div id="raw-data-tidy-up" class="section level1">
 <h1><span class="header-section-number">2</span> Raw data tidy up</h1>
-<pre class="r"><code>path = &quot;/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/lemon final data_March21.xlsx&quot;
+<pre class="r"><code>path = &quot;/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/Lemon paper data_B.Y.xlsx&quot;
 d = read_excel(path, sheet = &quot;March&quot;)
+d = d %&gt;% filter(!code %in% c(63:66)) # No. 63-66 belongs to comemrcially sourced lemon juices
 
 
 # Replace special values
@@ -453,13 +454,19 @@ vectorReplace = function(x, searchPattern){
 }
 
 
-d = apply(d, 2, vectorReplace, searchPattern = &quot;T.&quot;)
-d = apply(d, 2, vectorReplace, searchPattern = &quot;n.d.&quot;)
-d = apply(d, 2, vectorReplace, searchPattern = &quot;LOD&quot;) %&gt;% as_tibble()
+dd = d[, -c(1:4)]
+dd = apply(dd, 2, vectorReplace, searchPattern = &quot;T.&quot;)
+dd = apply(dd, 2, vectorReplace, searchPattern = &quot;n.d.&quot;)
+dd = apply(dd, 2, vectorReplace, searchPattern = &quot;LOD&quot;) %&gt;% as_tibble()
 
 d = cbind(d[, c(1:4)], # sample id information
-          apply(d[, -c(1:4)], 2, as.numeric)) %&gt;% # content in numeric values
-  as_tibble()</code></pre>
+          apply(dd, 2, as.numeric) %&gt;% as_tibble()) %&gt;% # content in numeric values
+  as_tibble()
+
+
+# convert code into ordered factor, in descending order of 1, 2, 3....
+d$code = d$code %&gt;% factor(levels = d$code, ordered = T)
+d$code = d$code %&gt;% factor(levels = rev(d$code), ordered = T)</code></pre>
 </div>
 <div id="exploratory-data-analysis-eda" class="section level1">
 <h1><span class="header-section-number">3</span> Exploratory data analysis (EDA)</h1>
@@ -483,9 +490,9 @@ plt.contentDistribution</code></pre>
   
 }
 
-func.plotCorrelation(whichType = &quot;authentic&quot;) + ggtitle(&quot;Correlation matrix - Authentic juice&quot;)</code></pre>
+func.plotCorrelation(whichType = &quot;authentic_L_J&quot;) + ggtitle(&quot;Correlation matrix - Authentic lemon juice&quot;)</code></pre>
 <p><img src="LemonMLscript_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<pre class="r"><code>func.plotCorrelation(whichType = &quot;commercial&quot;) + ggtitle(&quot;Correlation matrix - Commercial products&quot;)</code></pre>
+<pre class="r"><code>func.plotCorrelation(whichType = &quot;lemonade&quot;) + ggtitle(&quot;Correlation matrix - Commercial lemonade beverages&quot;)</code></pre>
 <p><img src="LemonMLscript_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
 </div>
 <div id="pca" class="section level2">
@@ -518,8 +525,8 @@ plot_ly(PC, x = ~ PC1, y =  ~PC2, z =  ~PC3, color = ~ type) %&gt;%
            zaxis = list(title = paste0(&quot;PC3, &quot;, round(eigen.values[3]/sum(eigen.values)* 100, 1), &quot;% explained&quot;))
          )
   )</code></pre>
-<div id="htmlwidget-e0541469b5ed4906484e" style="width:768px;height:768px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e0541469b5ed4906484e">{"x":{"visdat":{"15cf53a789a76":["function () ","plotlyVisDat"]},"cur_data":"15cf53a789a76","attrs":{"15cf53a789a76":{"x":{},"y":{},"z":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Interactive PCA","scene":{"xaxis":{"title":"PC1, 35.9% explained"},"yaxis":{"title":"PC2, 14.8% explained"},"zaxis":{"title":"PC3, 9.6% explained"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[2.16937890399153,1.91040110116648,1.73221609775543,1.17409021885505,-0.152810861888566,-2.77565576208736,0.722499018998943,-1.20627984740878,-1.93122000073008,-3.1998142506024,-2.91048610751429,-4.3598441953108,-0.864027408055558,-1.74786060716305,-1.94252884556735,-2.67962802442246,-3.15358925372303,2.02343716994806,-1.81916021687553,0.495095010615543,1.98993932127347,-0.266874177285252,0.640533422479092,1.98227516919192,-0.936599633956021,1.21521316995854,2.20681874569683,-1.69776657154801,0.429424810637125,1.88438413892544,-1.04678675944628,1.21178294735348,1.87946551113415,0.304845543706161,1.25227816125772,1.68166045692548],"y":[-0.658848045149263,-0.570935788341447,0.279712723268497,1.03059252962476,1.19419472565614,-3.69838690851849,1.52890157579717,2.36787722609301,2.65702938898717,2.31350201956368,2.2228264387465,2.0984469015658,3.28138990409283,3.49790347290262,3.10247632700314,2.62100094475333,1.82881405309405,-0.702774095542958,-2.84528951732795,0.181301846302691,-0.369267954510674,-1.75912024221848,0.0103710592361301,-0.339145113195276,-2.34936387065743,-0.124719566772218,-0.742423392014647,-3.16939115449346,-0.630269315863172,-0.621821127154626,-2.4791872736323,-0.0431198866705049,-0.131770434248737,-1.21604297905936,0.0395814373344747,0.603866378701767],"z":[-2.34480231778391,-1.48772010112747,-0.0664154067536629,0.198808796095033,1.32445580763647,-3.98764175084739,-0.476686544791779,-1.18923304921537,-0.850817517476233,-1.49126982123039,-1.55104397965071,-0.76386539880732,-0.707437499175226,-0.77549451816468,-1.05114694936007,-1.47700866911456,-0.436445552207564,-2.42409139119584,0.0528611176700419,-0.284881992020533,-2.21011066538489,0.192731310880614,0.129791548327964,-1.88150157195009,-0.232949319195479,0.79270784099746,-2.44483742830136,0.131294520704453,0.983512416012826,-1.3330038314345,0.0152601375277107,-0.0244703954086118,-1.76321272916386,-0.100619894487396,0.619932313614336,-0.0725424907837826],"type":"scatter3d","mode":"markers","name":"adulterated","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[1.01291888861507,0.467017620477701,1.08770193971381,-1.82252151547724,-0.0810594486462886,-1.2861435265349,-1.58337329601281,-5.79864711076063,-3.33174891166321,-5.4136870450468,-4.73765312586172,-6.69212394121198,-2.69752283619741,-1.78353553981187,-1.73677957338868,-2.38993482968795,-4.11680737531645,-1.16195413265596,0.506739269540331,-3.48009970882152,-0.376203414422354,-0.857598843272268,-1.83883839861107,0.74165954595812,-0.483336213686286,-0.837543346658189],"y":[0.169080929169469,0.158594341647139,0.612790925478432,0.330364090346352,0.849857336122177,0.420829674761175,0.185487991847175,-3.46629168307858,0.884970670884727,0.104153973985505,-2.78872554651875,-0.509753102437503,-1.37106595074677,-0.846144028623397,-0.476804903415557,-1.60685846193281,-0.806175321541067,0.398937905462601,0.603424819189591,0.534784578152911,0.972466212708072,-0.133406012583611,0.840472525659368,1.54179924537503,1.93220898225058,-1.01661683207685],"z":[0.830633678003543,0.950778721336475,0.627451596375145,2.01936685595534,1.39320085927018,1.32853220505203,1.30822664312303,0.302118087831581,1.69711392323811,1.54801778746243,0.457511416535522,-1.26844409195779,-0.674147572053593,-0.513832701768764,-0.253922198262404,0.921172512589743,-0.603020914492413,0.526093381610655,0.922606724473602,0.827893426285318,1.24075498108795,0.309405709839211,0.494844601168968,0.177126990631499,-0.0348071338903448,3.76743718992213],"type":"scatter3d","mode":"markers","name":"authentic","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[1.89232730615552,2.31625197081297,1.94393216636709,2.34865446086109,1.59293606077308,2.28848462782354,2.3066709029764,2.21854726758332,2.15878700617488,1.4656066349957,1.84789664963087,1.98050000431801,2.11417896993608,1.92511528500568,1.90898306379699,2.10910726441007,2.75198112189348,2.12520705223765,1.35976192555562,1.52397032649843,1.80403923964429,2.22756214659047,1.8542779384242,2.16467424101417,2.3541295612516,1.08529816975419,2.23861826953206,0.568768839137491],"y":[0.710448807271158,0.273696215566772,-0.733825165265762,0.641869477837081,-0.0935756718069633,1.01880950381587,0.155548305421993,0.66196106476181,0.726054333896771,-0.234591418650171,-0.473872699375168,0.200761685053095,0.370499665323442,-0.546162434730461,0.273898390721125,0.211214336229166,-1.01666608506747,0.597693203773363,-0.990733535829335,-0.824011044855591,-0.100157127138289,-0.444780818660945,-0.579827665813346,-0.34521607208014,-0.52480404199934,-2.28599043822512,-0.0628289610638123,-2.51170645654788],"z":[0.194182681224529,0.447745333699579,-0.328865970554087,-0.351341081414347,0.646267678203908,-0.602682448547042,0.529470397788582,0.393436242354996,0.266598152217312,0.90964172775609,1.13633230253395,0.933711245781841,0.387333762059552,0.489599465323024,0.783771414015199,0.59322518337101,-2.30291766475496,0.345297294954782,0.867489327691676,1.48048798956673,0.577424329583108,-0.02204326191445,0.530765010114453,0.578980134288455,-0.356071526981903,0.362070429497829,0.755477085176392,-0.559602936837571],"type":"scatter3d","mode":"markers","name":"commercial","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-a680a1fcd62a0dd1ba32" style="width:768px;height:768px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a680a1fcd62a0dd1ba32">{"x":{"visdat":{"ba5b356012c0":["function () ","plotlyVisDat"]},"cur_data":"ba5b356012c0","attrs":{"ba5b356012c0":{"x":{},"y":{},"z":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Interactive PCA","scene":{"xaxis":{"title":"PC1, 36.2% explained"},"yaxis":{"title":"PC2, 14.6% explained"},"zaxis":{"title":"PC3, 9.7% explained"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[2.20389088406314,1.926711421735,1.77951416303416,1.26150323965281,-0.0170028637236737,-2.83581303793999,0.826931149180603,-1.04996853488959,-1.75587704630478,-3.02737913947253,-2.73273669259192,-4.15528097227028,-0.679870325074674,-1.54965633028457,-1.76504342796687,-2.49612917482466,-2.97698283237236,2.06678728544948,-1.89738743562194,0.573074865174935,2.04937943108618,-0.298342087063436,0.713697028244777,2.02903722869705,-0.998746857710929,1.28156520585169,2.25612868812236,-1.77741360837482,0.483806477752783,1.93608329666552,-1.11947649064106,1.27438347939871,1.93655131558063,0.294795687376789,1.32238925035841,1.74843343412993],"y":[-0.863884127580887,-0.723593034242194,0.189031178996408,0.965421586109238,1.13011659108469,-3.47990621069197,1.45702615476475,2.34924512418384,2.69681403320621,2.39762357839735,2.22155484150797,2.14615193331418,3.20418162984162,3.47068918962414,3.0925650396635,2.58519363768152,1.84610035131542,-0.912898518287422,-2.94053431037783,0.0603926876915986,-0.566805559623167,-1.91337860606181,-0.123996136917145,-0.514348912430146,-2.42046877588209,-0.224987708936867,-0.966192342689676,-3.26259723633709,-0.670113590330222,-0.781684603112589,-2.58800520464562,-0.178012492628783,-0.309666831745377,-1.3541745414809,-0.0711532734893664,0.510318322559724],"z":[-2.31135749291718,-1.48007420904656,-0.0844405107186269,0.194274873386565,1.33368040319101,-3.81385551796597,-0.452379618730797,-1.15176995089331,-0.815349177662373,-1.44150840160822,-1.52471757314227,-0.738168702882259,-0.714158072170521,-0.794761830697067,-1.06603725101191,-1.49010928672485,-0.438196569234821,-2.38852954382292,0.0286302385826713,-0.290582521434385,-2.17340830834266,0.176699024037586,0.128033582468911,-1.86226304845675,-0.253584104398736,0.781759984002605,-2.40186038896918,0.103008576676539,0.975094946937081,-1.30371657970505,-0.00778653361879074,-0.0291686530892806,-1.74097920137533,-0.111024698619075,0.607471437083995,-0.0884625717958757],"type":"scatter3d","mode":"markers","name":"adulterated_L_J","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[1.08703101778363,0.545011651881009,1.17320435283617,-1.6743709204311,0.044060643268355,-1.15689509341559,-1.45531968696307,-5.87562903871065,-3.14941316345526,-5.2515890450667,-4.76615427478798,-6.60238049073632,-2.69058131407767,-1.78404847022686,-1.69546589174041,-2.39610363567913,-4.08175130457676,-1.04574468647462,0.612233107593138,-3.32186936328921,-0.246931575532457,-0.778470650809485,-1.69548367674388,0.846142172458172,-0.343261646641131,-0.734397342690873],"y":[0.0825422197700793,0.0935194457428475,0.541642683778984,0.298461442478402,0.777048611618373,0.384962984940137,0.138079670602391,-3.41653598287808,0.867465825230825,0.286035619082446,-2.70534019240289,-0.3353444571297,-1.30585921660448,-0.89087942778337,-0.428276479658377,-1.58031298059803,-0.718133685407986,0.346399567546707,0.498886060130667,0.554090327757904,0.898311627912902,-0.13454764992481,0.804191801462829,1.50051037202113,1.93515256632906,-1.0987329546203],"z":[0.816211401171566,0.943285208687562,0.620839564922702,2.02181225351488,1.39185492408596,1.32592075885861,1.31106545360869,0.263486006527804,1.68936939280766,1.54860721994509,0.429403604140427,-1.25890932228044,-0.69300549865546,-0.53339443602454,-0.259234079782732,0.921447966638739,-0.606348758532751,0.527143498421639,0.913819262169354,0.826794745893273,1.23787143769305,0.297288590461204,0.4967810118656,0.189581782267999,0.00777513297830091,3.75481371379483],"type":"scatter3d","mode":"markers","name":"authentic_L_J","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[1.96130272619982,2.36372242085348,1.94837092842979,2.40204358355511,1.64178712923643,2.35741561174261,2.35437790675563,2.2833577482029,2.22679148465357,1.51738775256099,1.90766778757428,2.04380882957343,2.16673472404012,1.97949524952982,1.97811255879705,2.16693460698639,2.81352268630803,2.19019676543234,1.40201292720866,1.58879360193259,1.84774613009756,2.26715614638924,1.9111711482196,2.28671119752239],"y":[0.641460698567837,0.189138443766018,-0.783998114190166,0.502583219401626,-0.164640959647425,0.887965847918956,0.057596108010166,0.557370244211098,0.6234762007955,-0.308468108222761,-0.576265396879682,0.110604460005004,0.277750447511307,-0.720966398152041,0.177079358862659,0.10868497395679,-1.26654060149943,0.491191801546536,-1.03247307693044,-0.963493732650079,-0.146016798277065,-0.592352815936816,-0.749532222548266,-0.169515241467993],"z":[0.201208550478228,0.435858498631772,-0.346233683664142,-0.370710359428071,0.624679556337572,-0.609383402174921,0.514506033106129,0.374669201342934,0.253916388930247,0.883326498679688,1.1313263963235,0.923813096683169,0.37910048073437,0.472686934078836,0.776631167281836,0.581060272622837,-2.2365330798415,0.331749273366742,0.867809112597294,1.46474924635433,0.569964473078517,-0.0259457158500911,0.518599877128284,0.738467600691272],"type":"scatter3d","mode":"markers","name":"lemonade","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="lda-full-data" class="section level2">
 <h2><span class="header-section-number">3.4</span> LDA (full data)</h2>
@@ -548,8 +555,9 @@ plt.lda.actual = EDA.lda %&gt;%
   labs(title = &quot;Actual classification&quot;) +
   # theme
   theme(legend.position = &quot;bottom&quot;) +
-  scale_color_brewer(palette = &quot;Set1&quot;) +
-  scale_fill_brewer(palette = &quot;Set1&quot;)
+  scale_color_manual(values = color.types) +
+  scale_fill_manual(values = color.types)
+  
 # plt.lda.actual
 
 
@@ -569,8 +577,8 @@ plt.lda.predicted =
                    color = &quot;white&quot;, fontface = &quot;bold&quot;, label.size = 0) + # no border line
   # theme
   theme(legend.position = &quot;bottom&quot;) +
-  scale_color_brewer(palette = &quot;Set1&quot;) +
-  scale_fill_brewer(palette = &quot;Set1&quot;) +
+  scale_color_manual(values = color.types) +
+  scale_fill_manual(values = color.types) +
   annotate(geom = &quot;text&quot;, label  = &quot;Squared numbers indicate \nincorrect predictions.&quot;,
            x = 1.5, y = 2.1, fontface = &quot;bold&quot;, size = 2.5)
 
@@ -615,9 +623,9 @@ grid.LD = grid.LD %&gt;%
 grid.LD = grid.LD %&gt;%
   mutate(boundary = apply(grid.LD[, 3:5], MARGIN = 1, FUN = which.min) %&gt;% as.character())
 
-grid.LD$boundary = grid.LD$boundary %&gt;% str_replace(pattern = &quot;1&quot;, replacement = &quot;adulterated&quot;)
-grid.LD$boundary = grid.LD$boundary %&gt;% str_replace(pattern = &quot;2&quot;, replacement = &quot;authentic&quot;)
-grid.LD$boundary = grid.LD$boundary %&gt;% str_replace(pattern = &quot;3&quot;, replacement = &quot;commercial&quot;)
+grid.LD$boundary = grid.LD$boundary %&gt;% str_replace(pattern = &quot;1&quot;, replacement = &quot;adulterated_L_J&quot;)
+grid.LD$boundary = grid.LD$boundary %&gt;% str_replace(pattern = &quot;2&quot;, replacement = &quot;authentic_L_J&quot;)
+grid.LD$boundary = grid.LD$boundary %&gt;% str_replace(pattern = &quot;3&quot;, replacement = &quot;lemonade&quot;)
 
 
 # Redraw LDA scatter plot with decision boundary
@@ -633,8 +641,8 @@ plt.lda.boundary = grid.LD %&gt;% rename(type.actual = boundary) %&gt;%
   geom_label(data = EDA.lda %&gt;% filter(status != T), size = 3,
              aes(label = code), label.r = unit(.5, &quot;lines&quot;)) +
   # theme
-  scale_color_brewer(palette = &quot;Set1&quot;) +
-  scale_fill_brewer(palette = &quot;Set1&quot;) +
+  scale_color_manual(values = color.types) +
+  scale_fill_manual(values = color.types) +
   theme(legend.position = &quot;bottom&quot;, panel.grid = element_blank())
 
 plt.lda.boundary</code></pre>
@@ -706,11 +714,11 @@ trainingSet.cv.scaled</code></pre>
 <pre><code>## # A tibble: 5 x 5
 ##   id    train.mean.sd train.scaled       validate.scaled    validate.actual
 ##   &lt;chr&gt; &lt;named list&gt;  &lt;named list&gt;       &lt;named list&gt;       &lt;named list&gt;   
-## 1 Fold1 &lt;list [2]&gt;    &lt;tibble [52 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;     
-## 2 Fold2 &lt;list [2]&gt;    &lt;tibble [52 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;     
-## 3 Fold3 &lt;list [2]&gt;    &lt;tibble [52 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;     
-## 4 Fold4 &lt;list [2]&gt;    &lt;tibble [52 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;     
-## 5 Fold5 &lt;list [2]&gt;    &lt;tibble [52 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;</code></pre>
+## 1 Fold1 &lt;list [2]&gt;    &lt;tibble [49 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;     
+## 2 Fold2 &lt;list [2]&gt;    &lt;tibble [49 × 15]&gt; &lt;tibble [13 × 15]&gt; &lt;fct [13]&gt;     
+## 3 Fold3 &lt;list [2]&gt;    &lt;tibble [50 × 15]&gt; &lt;tibble [12 × 15]&gt; &lt;fct [12]&gt;     
+## 4 Fold4 &lt;list [2]&gt;    &lt;tibble [50 × 15]&gt; &lt;tibble [12 × 15]&gt; &lt;fct [12]&gt;     
+## 5 Fold5 &lt;list [2]&gt;    &lt;tibble [50 × 15]&gt; &lt;tibble [12 × 15]&gt; &lt;fct [12]&gt;</code></pre>
 </div>
 </div>
 <div id="support-vector-machine-svm" class="section level2">
@@ -758,18 +766,18 @@ d.tune.svm.radial = d.CV.SVM.radial %&gt;%
 d.tune.svm.radial</code></pre>
 <pre><code>## # A tibble: 255 x 4
 ## # Groups:   gamma [17]
-##     gamma     cost accuracy.mean accuracy.sd
-##     &lt;dbl&gt;    &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1 0.0316    10             93.8        3.44
-##  2 0.0316    31.6           92.3        5.44
-##  3 0.0316     3.16          90.8        6.44
-##  4 0.1        3.16          90.8        6.44
-##  5 0.0316   100             89.2        4.21
-##  6 0.0316   316.            89.2        4.21
-##  7 0.0316  1000             89.2        4.21
-##  8 0.0316  3162.            89.2        4.21
-##  9 0.0316 10000             89.2        4.21
-## 10 0.0316 31623.            89.2        4.21
+##      gamma    cost accuracy.mean accuracy.sd
+##      &lt;dbl&gt;   &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+##  1 0.00316   31.6           85.4        7.07
+##  2 0.01      31.6           85.4        7.07
+##  3 0.0316     3.16          85.4        7.07
+##  4 0.0316    10             85.4        7.07
+##  5 0.1       10             85.4        7.07
+##  6 0.1       31.6           85.4        7.07
+##  7 0.1      100             85.4        7.07
+##  8 0.1      316.            85.4        7.07
+##  9 0.1     1000             85.4        7.07
+## 10 0.1     3162.            85.4        7.07
 ## # … with 245 more rows</code></pre>
 <pre class="r"><code># Func. def: plotting SVM hyper-parameter tuning result
 func.plot.tune.HyperParam = function( data, hyper1, hyper2){ 
@@ -818,18 +826,18 @@ d.tune.svm.polynomial = d.CV.SVM.polynomial %&gt;%
 d.tune.svm.polynomial</code></pre>
 <pre><code>## # A tibble: 90 x 4
 ## # Groups:   degree [6]
-##    degree    cost accuracy.mean accuracy.sd
-##     &lt;int&gt;   &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1      3    100           84.6        9.42
-##  2      3    316.          84.6        9.42
-##  3      3   1000           84.6        9.42
-##  4      3   3162.          84.6        9.42
-##  5      3  10000           84.6        9.42
-##  6      3  31623.          84.6        9.42
-##  7      3 100000           84.6        9.42
-##  8      3     10           83.1       10.0 
-##  9      5    316.          83.1       11.4 
-## 10      5   1000           83.1       11.4 
+##    degree      cost accuracy.mean accuracy.sd
+##     &lt;int&gt;     &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+##  1      3    100             83.7        6.14
+##  2      3    316.            83.7        6.14
+##  3      3   1000             83.7        6.14
+##  4      3   3162.            83.7        6.14
+##  5      3  10000             83.7        6.14
+##  6      3  31623.            83.7        6.14
+##  7      3 100000             83.7        6.14
+##  8      3     31.6           82.1        9.38
+##  9      3     10             81.9       11.2 
+## 10      3      3.16          78.7       13.9 
 ## # … with 80 more rows</code></pre>
 <pre class="r"><code># plot tune result of polynomial kernel
 plt.svm.tune.polynomial = 
@@ -862,21 +870,21 @@ d.tune.svm.linear</code></pre>
 <pre><code>## # A tibble: 15 x 3
 ##           cost accuracy.mean accuracy.sd
 ##          &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1    100               83.1        8.43
-##  2    316.              83.1        8.43
-##  3   1000               83.1        8.43
-##  4   3162.              83.1        8.43
-##  5  10000               83.1        8.43
-##  6  31623.              83.1        8.43
-##  7 100000               83.1        8.43
-##  8      1               83.1       10.0 
-##  9      3.16            83.1        6.44
-## 10     10               81.5        4.21
-## 11     31.6             80.0        4.21
-## 12      0.316           78.5       10.0 
-## 13      0.1             73.8       14.0 
-## 14      0.0316          69.2       15.4 
-## 15      0.01            56.9       12.9</code></pre>
+##  1      0.316           85.3       9.09 
+##  2      1               83.8       0.702
+##  3      3.16            80.6       4.36 
+##  4     10               80.6       4.36 
+##  5     31.6             78.8       5.27 
+##  6    100               78.8       5.27 
+##  7    316.              78.8       5.27 
+##  8   1000               78.8       5.27 
+##  9   3162.              78.8       5.27 
+## 10  10000               78.8       5.27 
+## 11  31623.              78.8       5.27 
+## 12 100000               78.8       5.27 
+## 13      0.1             77.2      11.3  
+## 14      0.0316          73.8      11.5  
+## 15      0.01            57.3      23.7</code></pre>
 <pre class="r"><code>d.tune.svm.linear %&gt;% ggplot(aes(x = cost, y = accuracy.mean)) + 
   geom_bar(stat = &quot;identity&quot;, alpha = .8) + geom_point() + geom_line() + 
   scale_x_log10() </code></pre>
@@ -889,9 +897,9 @@ rbind(k1, k2, k3)</code></pre>
 <pre><code>## # A tibble: 3 x 3
 ##   accuracy.mean accuracy.sd kernel    
 ##           &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;     
-## 1          93.8        3.44 radial    
-## 2          84.6        9.42 polynomial
-## 3          83.1        8.43 linear</code></pre>
+## 1          85.4        7.07 radial    
+## 2          83.7        6.14 polynomial
+## 3          85.3        9.09 linear</code></pre>
 <pre class="r"><code># radial kernel renders the best cross-validation result up to 90.4 (sd 6.08) % overal accuracy, with hyper-parameter gamma 0.1 and cost 10. Linear kernel gives 82.1% accuracy. Polynomial with optimal degree 3 achieved 82.4% accuracy. Both linear and polynomial kernel generated much higher validation standard deviation.
 
 cv.svm = k1 %&gt;% mutate(model = &quot;SVM&quot;)</code></pre>
@@ -905,10 +913,10 @@ cv.svm = k1 %&gt;% mutate(model = &quot;SVM&quot;)</code></pre>
 
 accuracy.training.svm = sum(predict(mdl.svm) == trainingSet.scaled$type) / nrow(trainingSet.scaled)*100
 cat(&quot;Accuracy on the training set is&quot;, accuracy.training.svm, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the training set is 93.84615 %.</code></pre>
+<pre><code>## Accuracy on the training set is 93.54839 %.</code></pre>
 <pre class="r"><code>accuracy.testing.svm = sum(predict(mdl.svm, newdata = testingSet.scaled) == testingSet.scaled$type) / nrow(testingSet.scaled) *100
 cat(&quot;Accuracy on the testing set is&quot;, accuracy.testing.svm, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the testing set is 76 %.</code></pre>
+<pre><code>## Accuracy on the testing set is 83.33333 %.</code></pre>
 <pre class="r"><code># confusion matrix
 predict.SVM = predict(mdl.svm, newdata = testingSet.scaled)
 
@@ -944,7 +952,7 @@ mdl.lda = lda(data = trainingSet.scaled, type ~., prior = rep(1/3, 3))
 # Prediction on the training set
 accuracy.training.LDA = sum(predict(mdl.lda)$class == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
 cat(&quot;Accuracy on the training set by Linear Discriminant Analysis is&quot;, accuracy.training.LDA, &quot;%.&quot; )</code></pre>
-<pre><code>## Accuracy on the training set by Linear Discriminant Analysis is 86.15385 %.</code></pre>
+<pre><code>## Accuracy on the training set by Linear Discriminant Analysis is 88.70968 %.</code></pre>
 <pre class="r"><code># Prediction on the testing set 
 fitted.lda = predict(mdl.lda, newdata = testingSet.scaled)
 predict.LDA = fitted.lda$class
@@ -954,7 +962,7 @@ cf.lda = table(predict.LDA, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.lda = sum(predict(mdl.lda, newdata = testingSet.scaled)$class == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the testing set by Linear Discriminant Analysis is&quot;, accuracy.testing.lda, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the testing set by Linear Discriminant Analysis is 72 %.</code></pre>
+<pre><code>## Accuracy on the testing set by Linear Discriminant Analysis is 66.66667 %.</code></pre>
 <pre class="r"><code># probability distribution sample-wise
 d.prob.lda = fitted.lda$posterior %&gt;% as_tibble() %&gt;% mutate(model = &quot;LDA&quot;)</code></pre>
 </div>
@@ -992,16 +1000,16 @@ d.tune.RF</code></pre>
 ## # Groups:   trees [10]
 ##    trees features accuracy.mean accuracy.sd
 ##    &lt;dbl&gt;    &lt;int&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1   400        5          92.3        5.44
-##  2  1000        3          92.3        5.44
-##  3   100        3          90.8        8.43
-##  4   100        4          90.8        3.44
-##  5   100        5          90.8        8.43
-##  6   200        3          90.8        8.43
-##  7   200        4          90.8        8.43
-##  8   300        2          90.8        8.43
-##  9   300        3          90.8        8.43
-## 10   300        5          90.8        8.43
+##  1   400        2          91.8        5.90
+##  2   700        2          91.8        5.90
+##  3   900        3          91.7        8.33
+##  4  1000        2          91.7        8.33
+##  5   300        2          90.3        6.68
+##  6   100        4          90.1        7.02
+##  7   300        3          90.1        7.02
+##  8   400        4          90.1        7.02
+##  9   400        6          90.1        7.02
+## 10   500        3          90.1        7.02
 ## # … with 60 more rows</code></pre>
 <pre class="r"><code>plt.RF.tune = d.tune.RF %&gt;% 
   func.plot.tune.HyperParam(hyper1 = &quot;trees&quot;, hyper2 = &quot;features&quot;) +
@@ -1022,7 +1030,7 @@ mdl.rf = randomForest(data = trainingSet.scaled, type ~., num.trees = 900, mtry 
 accuracy.training.RF = 
   sum(predict(mdl.rf, data = trainingSet.scaled) == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
 cat(&quot;Accuracy on the training set by Random Forest is&quot;, accuracy.training.RF, &quot;%&quot;)</code></pre>
-<pre><code>## Accuracy on the training set by Random Forest is 87.69231 %</code></pre>
+<pre><code>## Accuracy on the training set by Random Forest is 87.09677 %</code></pre>
 <pre class="r"><code># Prediction on the testing set by RF
 predict.RF = predict(mdl.rf, testingSet.scaled, type = &quot;response&quot;)
 
@@ -1031,7 +1039,7 @@ cf.RF = table(predict.RF, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.RF = sum(predict.RF == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the testing set using Random Forest is&quot;, accuracy.testing.RF, &quot;%&quot;) </code></pre>
-<pre><code>## Accuracy on the testing set using Random Forest is 80 %</code></pre>
+<pre><code>## Accuracy on the testing set using Random Forest is 83.33333 %</code></pre>
 <pre class="r"><code># Probability distribution of predicted test set
 d.prob.RF = predict(mdl.rf, testingSet.scaled, type = &quot;prob&quot;) %&gt;%
   as_tibble() %&gt;%
@@ -1061,7 +1069,7 @@ mdl.nb = naiveBayes(x = trainingSet.scaled[, -1],
 
 accuracy.training.NB = sum(predict(mdl.nb, newdata = trainingSet.scaled[, -1]) == trainingSet.scaled$type)/nrow(trainingSet.scaled) * 100
 cat(&quot;Accuracy on the training set using Naive Bayes is&quot;, accuracy.training.NB, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the training set using Naive Bayes is 86.15385 %.</code></pre>
+<pre><code>## Accuracy on the training set using Naive Bayes is 83.87097 %.</code></pre>
 <pre class="r"><code>predict.NB = predict(mdl.nb, testingSet.scaled[, -1])
 
 cf.NB = table(predict.NB, testingSet.scaled$type) %&gt;% 
@@ -1069,7 +1077,7 @@ cf.NB = table(predict.NB, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.NB = sum(predict.NB == testingSet.scaled$type)/nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the testing set using Naive Bayes is&quot;, accuracy.testing.NB, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the testing set using Naive Bayes is 84 %.</code></pre>
+<pre><code>## Accuracy on the testing set using Naive Bayes is 83.33333 %.</code></pre>
 <pre class="r"><code>d.prob.NB = predict(mdl.nb, testingSet.scaled[, -1], type = &quot;raw&quot;)  %&gt;%
   as_tibble() %&gt;% mutate(model = &quot;NB&quot;)
 # d.prob.NB</code></pre>
@@ -1107,7 +1115,7 @@ fitted.softmax.train = predict(softmax.cv, newx = trainingSet.scaled[, -1] %&gt;
 
 accuracy.training.LR = sum(fitted.softmax.train == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
 cat(&quot;Accuracy on the training set using lasso-regularized softmax regression is&quot;, accuracy.training.LR, &quot;%.&quot;) </code></pre>
-<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 87.69231 %.</code></pre>
+<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 90.32258 %.</code></pre>
 <pre class="r"><code># Prediction on the testing set
 predict.softmax = predict(softmax.cv, newx = testingSet.scaled[, -1] %&gt;% as.matrix(),
                           s = softmax.cv$lambda.1se, type = &quot;class&quot;) %&gt;% c()
@@ -1117,13 +1125,13 @@ cf.LR = table(predict.softmax, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.LR = sum(predict.softmax == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the training set using lasso-regularized softmax regression is&quot;, accuracy.testing.LR, &quot;%.&quot;) </code></pre>
-<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 80 %.</code></pre>
+<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 79.16667 %.</code></pre>
 <pre class="r"><code>table(predict.softmax, testingSet.scaled$type)</code></pre>
-<pre><code>##                
-## predict.softmax adulterated authentic commercial
-##     adulterated           8         2          1
-##     authentic             1         5          0
-##     commercial            1         0          7</code></pre>
+<pre><code>##                  
+## predict.softmax   adulterated_L_J authentic_L_J lemonade
+##   adulterated_L_J               9             3        1
+##   authentic_L_J                 0             4        0
+##   lemonade                      1             0        6</code></pre>
 <pre class="r"><code># Predicted probability distribution on the test set
 d.prob.LR = predict(softmax.cv, newx = testingSet.scaled[, -1] %&gt;% as.matrix(),
                     s = softmax.cv$lambda.1se, type = &quot;response&quot;) %&gt;%
@@ -1150,7 +1158,7 @@ d.prob = d.prob.lda %&gt;% rbind(d.prob.NB) %&gt;% rbind(d.prob.LR) %&gt;% rbind
 
 # plot sample-model wise probability distribution 
 plt.probabilityDistribution = d.prob %&gt;%
-  gather(c(adulterated, authentic, commercial), key = type, value = prob) %&gt;%
+  gather(c(adulterated_L_J, authentic_L_J, lemonade), key = type, value = prob) %&gt;%
   ggplot(aes(x = code, y = prob, fill = type)) +
   geom_bar(stat = &quot;identity&quot;, alpha = .8, color = &quot;white&quot;, size = .1, position = &quot;stack&quot;) +
   facet_wrap(~model, nrow = 1) +
@@ -1204,19 +1212,19 @@ plt.samplewisePrediction =
 <div id="confusion-matrix" class="section level3">
 <h3><span class="header-section-number">4.7.2</span> Confusion matrix</h3>
 <pre class="r"><code>d.cf.tidy = rbind(cf.lda, cf.LR) %&gt;% rbind(cf.NB) %&gt;% rbind(cf.RF) %&gt;% rbind(cf.svm) %&gt;%
-  gather(c(adulterated, authentic, commercial), key = actual, value = count)
+  gather(c(adulterated_L_J, authentic_L_J, lemonade), key = actual, value = count)
 
 # Def. func. abbreviating sample types (for display in confusion matrix figure)
 func.abreviateTypes = function(vector){
-  vector %&gt;% str_replace(pattern = &quot;adulterated&quot;, replacement = &quot;AD&quot;) %&gt;%
-    str_replace(pattern = &quot;authentic&quot;, replacement = &quot;AU&quot;) %&gt;% 
-    str_replace(pattern = &quot;commercial&quot;, replacement = &quot;CO&quot;)
+  vector %&gt;% str_replace(pattern = &quot;adulterated_L_J&quot;, replacement = &quot;ADLJ&quot;) %&gt;%
+    str_replace(pattern = &quot;authentic_L_J&quot;, replacement = &quot;AULJ&quot;) %&gt;% 
+    str_replace(pattern = &quot;lemonade&quot;, replacement = &quot;LMND&quot;)
 } 
 
 d.cf.tidy$predict = d.cf.tidy$predict %&gt;% func.abreviateTypes()
 d.cf.tidy$actual  = d.cf.tidy$actual %&gt;% func.abreviateTypes()
 
-types = factor(c(&quot;CO&quot;, &quot;AD&quot;, &quot;AU&quot;), ordered = T)
+types = factor(c(&quot;LMND&quot;, &quot;ADLJ&quot;, &quot;AULJ&quot;), ordered = T)
 
 # ordered axis
 d.cf.tidy$predict = d.cf.tidy$predict %&gt;% factor(levels = types, ordered = T)
@@ -1330,6 +1338,7 @@ plot_grid(plt.accuracy.confusionMatrix,
 </div>
 <div id="model-interpretation" class="section level1">
 <h1><span class="header-section-number">5</span> Model interpretation</h1>
+<pre class="r"><code>lemonFeatures = colnames(trainingSet)[-1]</code></pre>
 <div id="random-forest-1" class="section level2">
 <h2><span class="header-section-number">5.1</span> Random forest</h2>
 <pre class="r"><code>func.plot.ICE.RF = function(feature) {
@@ -1374,7 +1383,7 @@ plot_grid(plt.accuracy.confusionMatrix,
     geom_line(aes(group = instance), alpha = .3) +
     facet_wrap(~predicted.type, nrow = 1) +
     labs(caption = &quot;color by actual type, faceted by predicted type&quot;) +
-    scale_color_brewer(palette = &quot;Set1&quot;) +
+    scale_color_manual(values = color.types) +
     labs(title = paste0(feature, &quot; (Random Forest)&quot;), 
          x = &quot;Standard deviation grids&quot;,
          y = &quot;Predicted probability for each class&quot;) +
@@ -1419,7 +1428,7 @@ plot_grid(plt.accuracy.confusionMatrix,
   ICE.fitted = predict(softmax.cv, newx = feature.grid[, -1] %&gt;% as.matrix(),
                        s = softmax.cv$lambda.1se,, type = &quot;response&quot;) %&gt;%
     as.tibble() %&gt;%
-    rename(adulterated = adulterated.1, authentic = authentic.1, commercial = commercial.1)
+    rename(adulterated_L_J = adulterated_L_J.1, authentic_L_J = authentic_L_J.1, lemonade = lemonade.1)
   
   
   # Individual instance
@@ -1440,7 +1449,7 @@ plot_grid(plt.accuracy.confusionMatrix,
     ggplot(aes(x = grid, y = fitted.prob, color = actual.type)) +
     geom_line(aes(group = instance), alpha = .3) +
     facet_wrap(~predicted.type, nrow = 1) +
-    scale_color_brewer(palette = &quot;Set1&quot;) +
+    scale_color_manual(values = color.types) +
     labs(title = paste0(feature, &quot; (Logistic regression)&quot;), 
          x = &quot;Standard deviation grids&quot;, 
          y = &quot;Predicted probability for each class&quot;,
@@ -1467,7 +1476,7 @@ plot_grid(plt.accuracy.confusionMatrix,
 <pre class="r"><code># Model interpretation comparison: RF vs. LR
 func.plt.ICE.modelComparison.distribution = function(featureCode = 1){
   
-  lemonFeatures = colnames(trainingSet)[-1]
+  
   
   plt.ICE.citric.acid.logistic = func.plot.ICE.logistic(feature = lemonFeatures[featureCode])
   plt.ICE.citric.acid.randomForest = func.plot.ICE.RF(feature = lemonFeatures[featureCode])
@@ -1480,7 +1489,7 @@ func.plt.ICE.modelComparison.distribution = function(featureCode = 1){
             plot_grid(
               # authentic vs. adulterated
               d %&gt;% 
-                filter(type != &quot;commercial&quot;) %&gt;%
+                filter(type != &quot;lemonade&quot;) %&gt;%
                 ggplot(aes_string(x = lemonFeatures[featureCode], fill = &quot;type&quot;, color = &quot;type&quot;)) +
                 geom_density(alpha = .2, position = &quot;dodge&quot;) +
                 scale_color_manual(values = color.types) +

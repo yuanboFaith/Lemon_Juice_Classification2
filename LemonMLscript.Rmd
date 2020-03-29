@@ -52,13 +52,14 @@ theme_set(theme_bw() +
 
 # global color set
 color.types = c("firebrick", "steelblue", "darkgreen")
-names(color.types) = c("adulterated", "authentic", "commercial")
+names(color.types) = c("adulterated_L_J", "authentic_L_J", "lemonade")
 ```
 
 # Raw data tidy up
 ```{r, message=F, warning=F}
-path = "/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/lemon final data_March21.xlsx"
+path = "/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/Lemon paper data_B.Y.xlsx"
 d = read_excel(path, sheet = "March")
+d = d %>% filter(!code %in% c(63:66)) # No. 63-66 belongs to comemrcially sourced lemon juices
 
 
 # Replace special values
@@ -85,13 +86,20 @@ vectorReplace = function(x, searchPattern){
 }
 
 
-d = apply(d, 2, vectorReplace, searchPattern = "T.")
-d = apply(d, 2, vectorReplace, searchPattern = "n.d.")
-d = apply(d, 2, vectorReplace, searchPattern = "LOD") %>% as_tibble()
+dd = d[, -c(1:4)]
+dd = apply(dd, 2, vectorReplace, searchPattern = "T.")
+dd = apply(dd, 2, vectorReplace, searchPattern = "n.d.")
+dd = apply(dd, 2, vectorReplace, searchPattern = "LOD") %>% as_tibble()
 
 d = cbind(d[, c(1:4)], # sample id information
-          apply(d[, -c(1:4)], 2, as.numeric)) %>% # content in numeric values
+          apply(dd, 2, as.numeric) %>% as_tibble()) %>% # content in numeric values
   as_tibble()
+
+
+# convert code into ordered factor, in descending order of 1, 2, 3....
+d$code = d$code %>% factor(levels = d$code, ordered = T)
+d$code = d$code %>% factor(levels = rev(d$code), ordered = T)
+
 ```
 
 
@@ -116,8 +124,8 @@ func.plotCorrelation = function(whichType, title){
   
 }
 
-func.plotCorrelation(whichType = "authentic") + ggtitle("Correlation matrix - Authentic juice")
-func.plotCorrelation(whichType = "commercial") + ggtitle("Correlation matrix - Commercial products")
+func.plotCorrelation(whichType = "authentic_L_J") + ggtitle("Correlation matrix - Authentic lemon juice")
+func.plotCorrelation(whichType = "lemonade") + ggtitle("Correlation matrix - Commercial lemonade beverages")
 
 ```
 
@@ -182,8 +190,9 @@ plt.lda.actual = EDA.lda %>%
   labs(title = "Actual classification") +
   # theme
   theme(legend.position = "bottom") +
-  scale_color_brewer(palette = "Set1") +
-  scale_fill_brewer(palette = "Set1")
+  scale_color_manual(values = color.types) +
+  scale_fill_manual(values = color.types)
+  
 # plt.lda.actual
 
 
@@ -203,8 +212,8 @@ plt.lda.predicted =
                    color = "white", fontface = "bold", label.size = 0) + # no border line
   # theme
   theme(legend.position = "bottom") +
-  scale_color_brewer(palette = "Set1") +
-  scale_fill_brewer(palette = "Set1") +
+  scale_color_manual(values = color.types) +
+  scale_fill_manual(values = color.types) +
   annotate(geom = "text", label  = "Squared numbers indicate \nincorrect predictions.",
            x = 1.5, y = 2.1, fontface = "bold", size = 2.5)
 
@@ -253,9 +262,9 @@ grid.LD = grid.LD %>%
 grid.LD = grid.LD %>%
   mutate(boundary = apply(grid.LD[, 3:5], MARGIN = 1, FUN = which.min) %>% as.character())
 
-grid.LD$boundary = grid.LD$boundary %>% str_replace(pattern = "1", replacement = "adulterated")
-grid.LD$boundary = grid.LD$boundary %>% str_replace(pattern = "2", replacement = "authentic")
-grid.LD$boundary = grid.LD$boundary %>% str_replace(pattern = "3", replacement = "commercial")
+grid.LD$boundary = grid.LD$boundary %>% str_replace(pattern = "1", replacement = "adulterated_L_J")
+grid.LD$boundary = grid.LD$boundary %>% str_replace(pattern = "2", replacement = "authentic_L_J")
+grid.LD$boundary = grid.LD$boundary %>% str_replace(pattern = "3", replacement = "lemonade")
 
 
 # Redraw LDA scatter plot with decision boundary
@@ -271,8 +280,8 @@ plt.lda.boundary = grid.LD %>% rename(type.actual = boundary) %>%
   geom_label(data = EDA.lda %>% filter(status != T), size = 3,
              aes(label = code), label.r = unit(.5, "lines")) +
   # theme
-  scale_color_brewer(palette = "Set1") +
-  scale_fill_brewer(palette = "Set1") +
+  scale_color_manual(values = color.types) +
+  scale_fill_manual(values = color.types) +
   theme(legend.position = "bottom", panel.grid = element_blank())
 
 plt.lda.boundary
@@ -718,7 +727,7 @@ d.prob = d.prob.lda %>% rbind(d.prob.NB) %>% rbind(d.prob.LR) %>% rbind(d.prob.R
 
 # plot sample-model wise probability distribution 
 plt.probabilityDistribution = d.prob %>%
-  gather(c(adulterated, authentic, commercial), key = type, value = prob) %>%
+  gather(c(adulterated_L_J, authentic_L_J, lemonade), key = type, value = prob) %>%
   ggplot(aes(x = code, y = prob, fill = type)) +
   geom_bar(stat = "identity", alpha = .8, color = "white", size = .1, position = "stack") +
   facet_wrap(~model, nrow = 1) +
@@ -775,19 +784,19 @@ plt.samplewisePrediction =
 ### Confusion matrix
 ```{r, message=F, warning=F}
 d.cf.tidy = rbind(cf.lda, cf.LR) %>% rbind(cf.NB) %>% rbind(cf.RF) %>% rbind(cf.svm) %>%
-  gather(c(adulterated, authentic, commercial), key = actual, value = count)
+  gather(c(adulterated_L_J, authentic_L_J, lemonade), key = actual, value = count)
 
 # Def. func. abbreviating sample types (for display in confusion matrix figure)
 func.abreviateTypes = function(vector){
-  vector %>% str_replace(pattern = "adulterated", replacement = "AD") %>%
-    str_replace(pattern = "authentic", replacement = "AU") %>% 
-    str_replace(pattern = "commercial", replacement = "CO")
+  vector %>% str_replace(pattern = "adulterated_L_J", replacement = "ADLJ") %>%
+    str_replace(pattern = "authentic_L_J", replacement = "AULJ") %>% 
+    str_replace(pattern = "lemonade", replacement = "LMND")
 } 
 
 d.cf.tidy$predict = d.cf.tidy$predict %>% func.abreviateTypes()
 d.cf.tidy$actual  = d.cf.tidy$actual %>% func.abreviateTypes()
 
-types = factor(c("CO", "AD", "AU"), ordered = T)
+types = factor(c("LMND", "ADLJ", "AULJ"), ordered = T)
 
 # ordered axis
 d.cf.tidy$predict = d.cf.tidy$predict %>% factor(levels = types, ordered = T)
@@ -910,6 +919,12 @@ plot_grid(plt.accuracy.confusionMatrix,
 ```
 
 # Model interpretation
+
+```{r}
+lemonFeatures = colnames(trainingSet)[-1]
+```
+
+
 ## Random forest
 ```{r, message=F, warning=F}
 
@@ -955,7 +970,7 @@ func.plot.ICE.RF = function(feature) {
     geom_line(aes(group = instance), alpha = .3) +
     facet_wrap(~predicted.type, nrow = 1) +
     labs(caption = "color by actual type, faceted by predicted type") +
-    scale_color_brewer(palette = "Set1") +
+    scale_color_manual(values = color.types) +
     labs(title = paste0(feature, " (Random Forest)"), 
          x = "Standard deviation grids",
          y = "Predicted probability for each class") +
@@ -1001,7 +1016,7 @@ func.plot.ICE.logistic = function(feature) {
   ICE.fitted = predict(softmax.cv, newx = feature.grid[, -1] %>% as.matrix(),
                        s = softmax.cv$lambda.1se,, type = "response") %>%
     as.tibble() %>%
-    rename(adulterated = adulterated.1, authentic = authentic.1, commercial = commercial.1)
+    rename(adulterated_L_J = adulterated_L_J.1, authentic_L_J = authentic_L_J.1, lemonade = lemonade.1)
   
   
   # Individual instance
@@ -1022,7 +1037,7 @@ func.plot.ICE.logistic = function(feature) {
     ggplot(aes(x = grid, y = fitted.prob, color = actual.type)) +
     geom_line(aes(group = instance), alpha = .3) +
     facet_wrap(~predicted.type, nrow = 1) +
-    scale_color_brewer(palette = "Set1") +
+    scale_color_manual(values = color.types) +
     labs(title = paste0(feature, " (Logistic regression)"), 
          x = "Standard deviation grids", 
          y = "Predicted probability for each class",
@@ -1050,7 +1065,7 @@ func.plot.ICE.logistic = function(feature) {
 # Model interpretation comparison: RF vs. LR
 func.plt.ICE.modelComparison.distribution = function(featureCode = 1){
   
-  lemonFeatures = colnames(trainingSet)[-1]
+  
   
   plt.ICE.citric.acid.logistic = func.plot.ICE.logistic(feature = lemonFeatures[featureCode])
   plt.ICE.citric.acid.randomForest = func.plot.ICE.RF(feature = lemonFeatures[featureCode])
@@ -1063,7 +1078,7 @@ func.plt.ICE.modelComparison.distribution = function(featureCode = 1){
             plot_grid(
               # authentic vs. adulterated
               d %>% 
-                filter(type != "commercial") %>%
+                filter(type != "lemonade") %>%
                 ggplot(aes_string(x = lemonFeatures[featureCode], fill = "type", color = "type")) +
                 geom_density(alpha = .2, position = "dodge") +
                 scale_color_manual(values = color.types) +

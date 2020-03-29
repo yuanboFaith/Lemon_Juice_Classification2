@@ -46,15 +46,15 @@ theme_set(theme_bw() +
 
 # global color set
 color.types = c("firebrick", "steelblue", "darkgreen")
-names(color.types) = c("adulterated", "authentic", "commercial")
+names(color.types) = c("adulterated_L_J", "authentic_L_J", "lemonade")
 ```
 
 
 ```{r, message=F, warning=F, results='hide', echo=F}
 # Raw data tidy up
-path = "/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/lemon final data_March21.xlsx"
+path = "/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/Lemon paper data_B.Y.xlsx"
 d = read_excel(path, sheet = "March")
-
+d = d %>% filter(!code %in% c(63:66)) # No. 63-66 belongs to comemrcially sourced lemon juices
 
 # Replace special values
 vectorReplace = function(x, searchPattern){
@@ -80,13 +80,16 @@ vectorReplace = function(x, searchPattern){
 }
 
 
-d = apply(d, 2, vectorReplace, searchPattern = "T.")
-d = apply(d, 2, vectorReplace, searchPattern = "n.d.")
-d = apply(d, 2, vectorReplace, searchPattern = "LOD") %>% as_tibble()
+dd = d[, -c(1:4)]
+dd = apply(dd, 2, vectorReplace, searchPattern = "T.")
+dd = apply(dd, 2, vectorReplace, searchPattern = "n.d.")
+dd = apply(dd, 2, vectorReplace, searchPattern = "LOD") %>% as_tibble()
 
 d = cbind(d[, c(1:4)], # sample id information
-          apply(d[, -c(1:4)], 2, as.numeric)) %>% # content in numeric values
+          apply(dd, 2, as.numeric) %>% as_tibble()) %>% # content in numeric values
   as_tibble()
+
+
 ```
 
 
@@ -247,7 +250,7 @@ func.plot.ICE.RF = function(feature) {
     geom_line(aes(group = instance), alpha = .3) +
     facet_wrap(~predicted.type, nrow = 1) +
     labs(caption = "color by actual type, faceted by predicted type") +
-    scale_color_brewer(palette = "Set1") +
+    scale_color_manual(values = color.types) +
     labs(title = " Random forest", 
          x = "Standard deviation grids",
          y = "Predicted probability for each class") +
@@ -297,7 +300,7 @@ func.plot.ICE.logistic = function(feature) {
   ICE.fitted = predict(softmax.cv, newx = feature.grid[, -1] %>% as.matrix(),
                        s = softmax.cv$lambda.1se,, type = "response") %>%
     as.tibble() %>%
-    rename(adulterated = adulterated.1, authentic = authentic.1, commercial = commercial.1)
+    rename(adulterated_L_J = adulterated_L_J.1, authentic_L_J = authentic_L_J.1, lemonade = lemonade.1)
   
   
   # Individual instance
@@ -318,7 +321,7 @@ func.plot.ICE.logistic = function(feature) {
     ggplot(aes(x = grid, y = fitted.prob, color = actual.type)) +
     geom_line(aes(group = instance), alpha = .3) +
     facet_wrap(~predicted.type, nrow = 1) +
-    scale_color_brewer(palette = "Set1") +
+    scale_color_manual(values = color.types) +
     labs(title = "logistic regression (lasso)", 
          x = "Standard deviation grids", 
          y = "Predicted probability for each class",
@@ -362,7 +365,7 @@ func.plt.ICE.modelComparison.distribution = function(featureCode = 1){
             plot_grid(
               # authentic vs. adulterated
               d %>% 
-                filter(type != "commercial") %>%
+                filter(type != "lemonade") %>%
                 ggplot(aes_string(x = lemonFeatures[featureCode], fill = "type", color = "type")) +
                 geom_density(alpha = .2, position = "dodge") +
                 scale_color_manual(values = color.types) +
