@@ -40,6 +40,11 @@ library(tidyverse)
 
 ```{r, message=F, warning=F}
 set.seed(1)
+```
+
+
+```{r, message=F, warning=F}
+set.seed(2020)
 
 theme_set(theme_bw() +
             theme(strip.background = element_blank(),
@@ -896,7 +901,7 @@ plt.accuracy.confusionMatrix =
 
 ```
 
-**A**,accuracy of prediction of the 5-fold cross-validation within the training set; **B**, prediction accuracy of the training set using models based on entire training set; **C**, accuracy of the testing set using models based on entire training set.
+
 
 ```{r, message=F, warning=F, fig.height=10, fig.width=12}
 # Version for paper, temporarily hide legend for optimal layout, then manually add it in PPT
@@ -917,6 +922,8 @@ plot_grid(plt.accuracy.confusionMatrix,
           plt.samplewisePrediction.paperVersion,
           nrow = 2, rel_heights = c(2.5, 4))
 ```
+
+**A**,accuracy of prediction of the 5-fold cross-validation within the training set; **B**, prediction accuracy of the training set using models based on entire training set; **C**, accuracy of the testing set using models based on entire training set.
 
 # Model interpretation
 
