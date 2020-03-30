@@ -39,11 +39,6 @@ library(tidyverse)
 
 
 ```{r, message=F, warning=F}
-set.seed(1)
-```
-
-
-```{r, message=F, warning=F}
 set.seed(2020)
 
 theme_set(theme_bw() +
