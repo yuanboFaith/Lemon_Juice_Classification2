@@ -42,8 +42,6 @@ library(tidyverse)
 set.seed(2020)
 ```
 
-*Note that while using the same seed "2020", running on a local Mac in a normal R session appears to generates different randomization and different prediction result than otherwise when "rmarkdown::render_site" the corresponding R markdown file to upload online. To reproduce the result published in our paper, simply copy the script presented here and re-run the script in a local computer environemnt in a normal R session.* 
-
 
 ```{r, message=F, warning=F}
 theme_set(theme_bw() +
@@ -602,7 +600,7 @@ mdl.rf = randomForest(data = trainingSet.scaled, type ~., num.trees = 900, mtry 
 
 # Prediction on the training set
 accuracy.training.RF = 
-  sum(predict(mdl.rf, data = trainingSet.scaled) == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
+  sum(predict(mdl.rf, newdata = trainingSet.scaled) == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
 cat("Accuracy on the training set by Random Forest is", accuracy.training.RF, "%")
 
 # Prediction on the testing set by RF
