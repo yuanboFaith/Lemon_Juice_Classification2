@@ -493,7 +493,7 @@ cv.svm = k1 %>% mutate(model = "SVM")
 ### Training & testing 
 ```{r, message=F, warning=F}
 mdl.svm = svm(data = trainingSet.scaled, type ~., 
-              # gamma = d.tune.svm.radial$gamma[1], cost = d.tune.svm.radial$cost[1],
+              gamma = d.tune.svm.radial$gamma[1], cost = d.tune.svm.radial$cost[1],
               kernel = "radial", type = "C-classification")
 
 accuracy.training.svm = sum(predict(mdl.svm) == trainingSet.scaled$type) / nrow(trainingSet.scaled)*100
