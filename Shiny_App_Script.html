@@ -307,6 +307,7 @@ library(rdrop2)
 
 # general function
 library(readxl)
+library(writexl)
 library(rebus)
 library(stringr)
 library(gridExtra)
@@ -317,35 +318,59 @@ library(RColorBrewer)
 library(glmnet)
 library(MASS)
 library(e1071)
-library(rsample)
+library(rsample)    
 library(randomForest)
 
 # finally load tidyverse avoiding key functions from being masked
 library(tidyverse)
 
 
-
-
-# Import data from Dropbox --------
+# IMPORT DATA FROM DROPBOX --------
 drop_auth()
 token = drop_auth()
 saveRDS(token, file = &quot;token.rds&quot;)
 
 d = drop_read_csv(file = &quot;Shiny lemon final data_CLEANED UP.csv&quot;) 
 
-# check extreme values of original data
+
+
+# TEMPLATE DOWNLOAD, FOR BATCH SAMPLE PREDICTION
+d.copy = d
+
+# Note that d is the database used for model construction
+# A column name tidied version is returned as the template for batch prediction
+# When an Excel file is uploaded by user, the column name is now incompatibile with models (containing invalid spaces etc)  
+# Update the Excel column names used for the prior models
+colnames(d.copy) = colnames(d.copy) %&gt;% str_replace(pattern = DOT, replacement = &quot; &quot;)
+for (i in 1:length(colnames(d.copy))){
+    if (colnames(d.copy)[i] == &quot;X3 4.di.HBA&quot;) {colnames(d.copy)[i] = &quot;3,4-diHBA&quot;
+    } else if (colnames(d.copy)[i] == &quot;X3 HBA&quot;) { colnames(d.copy)[i] = &quot;3-HBA&quot;
+    } else if (colnames(d.copy)[i] == &quot;p Coumaric.acid&quot;) {colnames(d.copy)[i] = &quot;p-Coumaric acid&quot;
+    } else if (colnames(d.copy)[i] == &quot;X4 HBA&quot;) {colnames(d.copy)[i] = &quot;4-HBA&quot;
+    } else if (colnames(d.copy)[i] == &quot;glucose fructose&quot;) { colnames(d.copy)[i] = &quot;Glucose &amp; Fructose&quot;
+    }
+}
+
+d.TemplateForDownload = cbind(Sample = 1:nrow(d.copy), d.copy %&gt;% select(-c(1:4))) %&gt;% 
+    as_tibble()
+d.TemplateForDownload
+
+
+
+
+# CHECK EXTREME VALUES
 # d[, -c(1:4)]  %&gt;% apply(2, min)
 # d[, -c(1:4)]  %&gt;% apply(2, max)
 
 
-# Global color set
+# GLOBAL COLOR SETUP
 Pastel1 = brewer.pal(9, &quot;Pastel1&quot;)
 color.types = Pastel1[1:3]
-names(color.types) = c(&quot;adulterated&quot;, &quot;authentic&quot;, &quot;commercial&quot;)
+names(color.types) = c(&quot;ADLJ&quot;, &quot;AULJ&quot;, &quot;LMND&quot;)
 
 
 
-# normalize training set (entire dataset)
+# DATASET NORMALIZATION (TRAININGSET)
 d.contentOnly = d %&gt;% select(-c(code, Sample, type, character))
 d.scaled = cbind(type = d$type, d.contentOnly %&gt;% scale() %&gt;% as_tibble()) %&gt;% as_tibble()
 vector.mean = apply(d.contentOnly, 2, mean)
@@ -354,14 +379,9 @@ vector.std =  apply(d.contentOnly, 2, sd)
 
 
 
-# MODELS -----
+# BUILD UP MODELS USING ENTIRE DATASET
 # Linear Discriminant Analysis (LDA) 
 mdl.lda = lda(data = d.scaled, type ~., prior = rep(1/3, 3))
-
-fitted.lda = predict(mdl.lda, newdata = newSample.scaled)
-fitted.label.lda = fitted.lda$class
-fitted.prob.lda = fitted.lda$posterior
-
 
 
 # Support vector machine (SV) 
@@ -422,10 +442,11 @@ mdl.lr = glmnet(x = d.scaled[, -1] %&gt;% as.matrix(), y = d.scaled$type,
                 lambda = 0.07898059,  family = &quot;multinomial&quot;, alpha = 1)
 
 
+# -----
 
 
 
-# Define UI -----
+# UI
 ui &lt;- fluidPage(
     
     br(),
@@ -434,69 +455,167 @@ ui &lt;- fluidPage(
     
     br(),
     
+    p(strong(em(a(&quot;See construction code.&quot;, href = &quot;https://yuanbofaith.github.io/Lemon_Juice_Classification2/Shiny_App_Script.html&quot;)))),
+    
     
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
             
-            strong(see [construction script](https://boyuan.shinyapps.io/CatnipQC/) ),
+            # -----
+            
+            conditionalPanel(
+                
+                &#39;input.myPrediction === &quot;Single sample prediction&quot;&#39;, 
                 
                 # strong(&quot;Organic acids&quot;, style = &quot;color:orange; font-size: 120%;&quot;),
-                fluidRow(column(4, sliderInput(&quot;Citric.acid&quot;, &quot;Citric acid&quot;, min = 0, max = 200, value = 12.97)),
-                         column(4, sliderInput(&quot;Malic.acid&quot;, &quot;Malic acid&quot;, min = 0, max = 60, value = 6.52)),
-                         column(4, sliderInput(&quot;Ascorbic.acid&quot;, &quot;Ascorbic acid&quot;, min = 0, max = 15, value = 0.07))),
+                fluidRow(column(4, sliderInput(&quot;Citric.acid&quot;, &quot;Citric acid&quot;, min = 0, max = 200/2, value = 12.97, sep = .1)),
+                         column(4, sliderInput(&quot;Malic.acid&quot;, &quot;Malic acid&quot;, min = 0, max = 60/2, value = 6.52, sep = .1)),
+                         column(4, sliderInput(&quot;Ascorbic.acid&quot;, &quot;Ascorbic acid&quot;, min = 0, max = 15/2, value = 0.07, sep = .1))),
+                
+                
+                # strong(&quot;Saccharides&quot;, style = &quot;color:orange; font-size: 120%;&quot;),
+                fluidRow(column(4, sliderInput(&quot;Sucrose&quot;, &quot;Sucrose&quot;, min = 0, max = 400/2, value = 12.7, sep = .1)),
+                         column(4, sliderInput(&quot;glucose.fructose&quot;, &quot;Glu/Fructose&quot;, min = 0, max = 600/2, value = 35.02, sep = .1))),
+                
+                
+                # strong(&quot;Phenolic acids&quot;, style = &quot;color:orange; font-size: 120%;&quot;),
+                
+                fluidRow(column(4, sliderInput(&quot;X3.4.di.HBA&quot;, &quot;3, 4-diHBA&quot;, min = 0, max = 800/2, value = 92.14, sep = .1)),
+                         column(4, sliderInput(&quot;X3.HBA&quot;, &quot;3-HBA&quot;, min = 0, max = 2000/2, value = 7.92, sep = .1)),
+                         column(4, sliderInput(&quot;Caffeic.acid&quot;, &quot;Caffeic acid&quot;, min = 0, max = 300/2, value = 0), sep = .1)),
+                
+                fluidRow(column(4, sliderInput(&quot;X4.HBA&quot;, &quot;4-HBA&quot;, min = 0, max = 150/2, value = 40.17, sep = .1)),
+                         column(4, sliderInput(&quot;p.Coumaric.acid&quot;, &quot;Coumaric acid&quot;, min = 0, max = 3000/2, value = 13.24, sep = .1)),
+                         column(4, sliderInput(&quot;Ferulic.acid&quot;, &quot;Ferulic acid&quot;, min = 0, max = 1200/2, value = 17.91, sep = .1))),
+                
+                
+                # strong(&quot;Assays&quot;, style = &quot;color:orange; font-size: 120%;&quot;),
+                
+                fluidRow(column(4, sliderInput(&quot;TPP.test&quot;, &quot;TPP test&quot;, min = 0, max = 15/2, value = 1.06, sep = .1)),
+                         column(4, sliderInput(&quot;Antioxidant.test&quot;, &quot;Folin&#39;s test&quot;, min = 0, max = 15/2, value = 3.3), sep = .1),
+                         column(4, sliderInput(&quot;FRAP.test&quot;, &quot;FRAP test&quot;, min = 0, max = 12/2, value = 0.4, sep = .1))),
+                
+                
+                # strong(&quot;Model names are abbreviated as acronyms:&quot;), br(), 
+                span(strong(&quot;LDA&quot;), &quot;, Linear Discriminant Analysis&quot;), br(),br(),
+                span(strong(&quot;LR&quot;), &quot;, Logistic (softmax) regression, lasso-regularized&quot;), br(),br(),
+                span(strong(&quot;NB&quot;), &quot;, Naive Bayes&quot;), br(),br(),
+                span(strong(&quot;RF&quot;), &quot;Random Forest&quot;), br(),br(),
+                span(strong(&quot;SVM&quot;), &quot;, Support Vector Machine&quot;), br(),br() 
+                
+            ), 
             
+            # ----
             
+            conditionalPanel(
+                &#39;input.myPrediction === &quot;Batch sample prediction&quot;&#39;,
+                
+                downloadButton(&quot;downloadTemplate&quot;, &quot;Download table template for batch prediction&quot;,
+                               style=&quot;color: white; background-color: steelblue; border-color: black&quot;),
+                
+                fileInput(inputId = &quot;userfile&quot;, label = NULL, buttonLabel = &quot;Browse...Excel input&quot;,
+                          width = &#39;700px&#39;, placeholder = &quot;Upload lemon juice dataset&quot;),
+                
+                
+                # plot axis text
+                
+                fluidRow(
+                    column(6, sliderInput(inputId = &quot;size.sampleCode&quot;, label = &quot;Font size of axis text&quot;, 
+                                          min = 0, max = 20, value = 12, step = .5)),
+                    column(6, sliderInput(inputId = &quot;step.sampleCode&quot;, label = &quot;Steps of codes label&quot;, 
+                                          min = 1, max = 10, value = 5, step = 1))
+                ),
+                
+                # plot dimension
+                fluidRow(
+                    column(6, sliderInput(inputId = &quot;plotHeight&quot;, label = &quot;Plot height&quot;, 
+                                          min = 100, max = 1000, value = 500, step = 25) ),
+                    column(6, sliderInput(inputId = &quot;plotWidth&quot;, label = &quot;Plot width&quot;, 
+                                          min = 500, max = 1200, value = 825, step = 25) )
+                ),
+                
             
-            # strong(&quot;Saccharides&quot;, style = &quot;color:orange; font-size: 120%;&quot;),
-            fluidRow(column(4, sliderInput(&quot;Sucrose&quot;, &quot;Sucrose&quot;, min = 0, max = 400, value = 12.7)),
-                     column(4, sliderInput(&quot;glucose.fructose&quot;, &quot;Glu/Fructose&quot;, min = 0, max = 600, value = 35.02))),
-            
-            
-            
-            # strong(&quot;Phenolic acids&quot;, style = &quot;color:orange; font-size: 120%;&quot;),
-            
-            fluidRow(column(4, sliderInput(&quot;X3.4.di.HBA&quot;, &quot;3, 4-diHBA&quot;, min = 0, max = 800, value = 92.14)),
-                     column(4, sliderInput(&quot;X3.HBA&quot;, &quot;3-HBA&quot;, min = 0, max = 2000, value = 7.92)),
-                     column(4, sliderInput(&quot;Caffeic.acid&quot;, &quot;Caffeic acid&quot;, min = 0, max = 300, value = 0))),
-            
-            fluidRow(column(4, sliderInput(&quot;X4.HBA&quot;, &quot;4-HBA&quot;, min = 0, max = 150, value = 40.17)),
-                     column(4, sliderInput(&quot;p.Coumaric.acid&quot;, &quot;Coumaric acid&quot;, min = 0, max = 3000, value = 13.24)),
-                     column(4, sliderInput(&quot;Ferulic.acid&quot;, &quot;Ferulic acid&quot;, min = 0, max = 1200, value = 17.91))),
-            
-            
-            
-            # strong(&quot;Assays&quot;, style = &quot;color:orange; font-size: 120%;&quot;),
-            
-            fluidRow(column(4, sliderInput(&quot;TPP.test&quot;, &quot;TPP test&quot;, min = 0, max = 15, value = 1.06)),
-                     column(4, sliderInput(&quot;Antioxidant.test&quot;, &quot;Folin&#39;s test&quot;, min = 0, max = 15, value = 3.3)),
-                     column(4, sliderInput(&quot;FRAP.test&quot;, &quot;FRAP test&quot;, min = 0, max = 10, value = 0.37))),
-            
-            
-            # strong(&quot;Model names are abbreviated as acronyms:&quot;), br(), 
-            span(strong(&quot;LDA&quot;), &quot;, Linear Discriminant Analysis&quot;), br(),br(),
-            span(strong(&quot;LR&quot;), &quot;, Logistic (softmax) regression, lasso-regularized&quot;), br(),br(),
-            span(strong(&quot;NB&quot;), &quot;, Naive Bayes&quot;), br(),br(),
-            span(strong(&quot;RF&quot;), &quot;Random Forest&quot;), br(),br(),
-            span(strong(&quot;SVM&quot;), &quot;, Support Vector Machine&quot;), br(),br()
-            
+                br(),br(),
+                # download predicted result table
+                downloadButton(&quot;downloadPredict&quot;, &quot;Download predicted identity table&quot;,
+                               style=&quot;color: white; background-color: orange; border-color: black&quot;),
+                
+                # strong(&quot;Model names are abbreviated as acronyms:&quot;), br(), 
+                br(),br(),br(),
+                span(strong(&quot;LDA&quot;), &quot;, Linear Discriminant Analysis&quot;), br(),br(),
+                span(strong(&quot;LR&quot;), &quot;, Logistic (softmax) regression, lasso-regularized&quot;), br(),br(),
+                span(strong(&quot;NB&quot;), &quot;, Naive Bayes&quot;), br(),br(),
+                span(strong(&quot;RF&quot;), &quot;Random Forest&quot;), br(),br(),
+                span(strong(&quot;SVM&quot;), &quot;, Support Vector Machine&quot;), br(),br() 
+                
+            )
         ),
         
         # Show a plot of the generated distribution
         mainPanel(
-            plotOutput(&quot;plt.singleSampleFitted&quot;, height = 500)
+            tabsetPanel(
+                id = &#39;myPrediction&#39;,
+                
+                tabPanel(&quot;Single sample prediction&quot;,
+                         
+                         br(),
+                         
+                         p(&quot;This section makes prediction of the identity of a single sample over three possible outcomes:  authentic lemon juice (&quot;, strong(&quot;AULJ&quot;), &quot;), adulterated lemon juice (&quot;, strong(&quot;ADLJ&quot;), &quot;), and lemonade beverages (&quot;, strong(&quot;LMND&quot;), &quot;). It also presents the associated predicted probability for each class under different mathematical models. The second function, while useful for decision making, also serves as a vital tool for interpretation of the mechanism of the “backbox” models, and could be viewed as a convenient dynamic realization of the&quot;, a(&quot;individual conditional expectation (ICE) plot.&quot;, href = &quot;https://yuanbofaith.github.io/Lemon_Juice_Classification2/ICEplots.html&quot;, style = &quot;color:steelblue&quot;), style = &quot;color: black; font-size:105%;&quot;),
+                         
+                         p(&quot;For prediction of multiple samples, go to&quot;, code(&quot;Batch sample prediction&quot;), &quot;tab above.&quot;,
+                           style = &quot;color: black; font-size:105%;&quot;),
+                         
+                         br(),br(),
+                         
+                         strong(&quot;Figure 1. Lemon juice identity prediction result. (A), predicted identity. (B), identity probability.&quot;,
+                                style = &quot;font-size:105%&quot;),
+                         br(),br(),
+                         
+                         plotOutput(&quot;plt.singleSampleFitted&quot;, height = 500)
+                ),
+                
+                tabPanel(&quot;Batch sample prediction&quot;,
+                         
+                         br(),
+                         
+                         
+                         p(&quot;This section makes prediction of the identity of multile samples over three possible outcomes:  authentic lemon juice (&quot;, strong(&quot;AULJ&quot;), &quot;), adulterated lemon juice (&quot;, strong(&quot;ADLJ&quot;), &quot;), and lemonade beverages (&quot;, strong(&quot;LMND&quot;), &quot;). Users are encouraged to tightly follow the format of the template. Ensure that the content value is numeric and that the column header is not changed before uploading the dataset to this application.&quot;, style = &quot;color:black; font-size:105%;&quot;),
+                         
+                         p(&quot;The default presents the prediction result of the template data&quot;, em(&quot;per se,&quot;), &quot;which is also the dataset used to train the models. For user’s reference, original samples 1-26 are AULJ, 27-62 ADLJ, and 63-86 LMND.&quot;, style = &quot;color:black; font-size:105%;&quot;),  
+                         
+                         br(),
+                         
+                         strong(&quot;Figure 1. Visual overview of the predicted identity of lemon juice products.&quot;, 
+                                style = &quot;font-size:105%&quot;),
+                         # plotOutput(&quot;batch.plt.fitted.model&quot;, height = 500),
+                         uiOutput(&quot;ui.batch.plt.fitted.model&quot;), 
+                         
+                         br(),br(),
+                         strong(&quot;Figure 2. Predicted identity probabilities of each sample.&quot;,
+                                style = &quot;font-size:105%&quot;), br(),
+                         uiOutput(&quot;ui.batch.plt.prob&quot;),
+                         
+                         br(),br(),
+                         strong(&quot;Table 1. Predicted identity of lemon juice products (result of Figure 1)&quot;, 
+                                style = &quot;font-size:105%&quot;),br(),br(),
+                         DTOutput(&quot;batch.DT&quot;),
+                         br(),br(),br(),br(),br())
+            )
         )
     )
 )
 
+
+
 # Define server logic required to draw a histogram
 server &lt;- function(input, output) {
     
-    # SINGLE SAMPLE PREDICTION
+    # SINGLE SAMPLE PREDICTION -----
     
     output$plt.singleSampleFitted = renderPlot({
         
-        # read user input data \
+        # read user input data 
         newSample = data.frame(
             # Organic acids
             Citric.acid = input$Citric.acid, Malic.acid = input$Malic.acid, Ascorbic.acid = input$Ascorbic.acid,
@@ -516,9 +635,14 @@ server &lt;- function(input, output) {
         
         
         # ALL model results 
-        
         # LDA
+        fitted.lda = predict(mdl.lda, newdata = newSample.scaled)
+        fitted.label.lda = fitted.lda$class
+        fitted.prob.lda = fitted.lda$posterior
+        
+        # SVM
         fitted.label.svm = predict(mdl.svm, newdata = newSample.scaled)
+        
         # RF
         fitted.label.rf = predict(mdl.rf, newSample.scaled, type = &quot;response&quot;)
         fitted.prob.rf =  predict(mdl.rf, newSample.scaled, type = &quot;prob&quot;)
@@ -593,6 +717,7 @@ server &lt;- function(input, output) {
             
             geom_text(aes(label = round(fitted.prob, 2)), position = position_stack(.5), 
                       color = &quot;black&quot;, fontface = &quot;bold&quot;, size = 5) +
+            theme_bw() +
             theme(axis.text.x = element_blank(),
                   axis.title.x = element_blank(),
                   axis.ticks.x = element_blank(),
@@ -603,7 +728,9 @@ server &lt;- function(input, output) {
                   panel.border = element_blank(),
                   panel.grid = element_blank(),
                   legend.title = element_blank(),
-                  strip.text = element_text(size = 17),
+                  
+                  strip.text = element_text(size = 17, face = &quot;bold&quot;),
+                  strip.background = element_blank(),
                   
                   legend.position = &quot;bottom&quot;,
                   legend.text = element_text(face = &quot;bold&quot;, size = 14))  +
@@ -617,10 +744,212 @@ server &lt;- function(input, output) {
         
         # Combine all plots
         plt.singleSampleFitted = 
-            plot_grid(plt.labels, whiteSpace, plt.prob, nrow = 3, rel_heights = c(2, .6, 5),
+            plot_grid(plt.labels, whiteSpace, plt.prob, nrow = 3, rel_heights = c(2, .7, 5),
                       labels = c(&quot;A&quot;, &quot;&quot;, &quot;B&quot;), label_size = 23, label_colour = &quot;firebrick&quot;)
         return(plt.singleSampleFitted)
     })
+    
+    
+    
+    # BATCH SAMPLE PREDICTION -----
+    output$downloadTemplate = downloadHandler(
+        filename = &quot;Lemon template for batch prediction.xlsx&quot;,
+        content = function(file) {
+            write_xlsx(d.TemplateForDownload, path = file)  
+        } 
+    )
+    
+    
+    d.newSample.Batch.scaled = reactive({
+        
+        if (is.null(input$userfile)) { 
+            d.newSample.Batch = d.TemplateForDownload
+            # remove the sample code column; render pure numeric dataset
+            d.newSample.Batch = d.newSample.Batch %&gt;% select(-1) 
+            colnames(d.newSample.Batch) = colnames(d)[-c(1:4)]
+            
+            # normalize the data
+            d.newSample.Batch.scaled = d.newSample.Batch %&gt;% as.data.frame() %&gt;%
+                scale(center = vector.mean, scale = vector.std) %&gt;% as.data.frame() 
+            # note that should conver to dataframe or tibble; otherwise pop up error, possibly due to type incompatability with models 
+            
+            return(d.newSample.Batch.scaled)
+            
+            
+        } else {
+            # Read user-input excel file
+            infile &lt;- input$userfile
+            d.newSample.Batch = read_excel(infile$datapath)
+            
+            # &quot;make names&quot; of the input excel column names, ensure it&#39;s compatible with variable names in the model (global environment)
+            d.newSample.Batch = d.newSample.Batch %&gt;% select(-1)
+            colnames(d.newSample.Batch) = colnames(d)[-c(1:4)] # note that d is in the global environment
+            d.newSample.Batch
+            
+            # normalize the input batch dataset
+            d.newSample.Batch.scaled = d.newSample.Batch %&gt;% 
+                scale(center = vector.mean, scale = vector.std) %&gt;% as_tibble() # note that vector.mean/std in the global environment
+            
+            return(d.newSample.Batch.scaled)
+            
+        }
+        
+    })
+    
+    batchResults = reactive({ 
+        # PREDICT USING BUILT MODELS (FROM THE GLOBAL ENVIRONEMNT)
+        # Predicted type
+        fitted.label.lda = predict(mdl.lda, newdata = d.newSample.Batch.scaled())$class
+        fitted.prob.lda = predict(mdl.lda, newdata = d.newSample.Batch.scaled())$posterior
+        
+        fitted.label.svm = predict(mdl.svm, newdata = d.newSample.Batch.scaled())
+        
+        fitted.label.rf = predict(mdl.rf, d.newSample.Batch.scaled(), type = &quot;response&quot;)
+        fitted.prob.rf =  predict(mdl.rf, d.newSample.Batch.scaled(), type = &quot;prob&quot;)
+        
+        fitted.label.nb  = predict(mdl.nb, newdata = d.newSample.Batch.scaled())
+        fitted.prob.nb = predict(mdl.nb, newdata = d.newSample.Batch.scaled(), type = &quot;raw&quot;)
+        
+        # Note that the output type from glmnet here regarding one or multiple samples is a bit different!!
+        # For easy troubleshooting and readability, the prediction procedure is not wrapped up as function for single and batch samples prediction, but rather explicitly written out despite code redundacy
+        fitted.label.lr = predict(mdl.lr, newx = d.newSample.Batch.scaled() %&gt;% as.matrix(), type = &quot;class&quot;) %&gt;% c()
+        fitted.prob.lr = predict(mdl.lr, newx = d.newSample.Batch.scaled() %&gt;% as.matrix(),
+                                 lambda = 0.07898059, type = &quot;response&quot;)[, , 1] 
+        
+        d.fitted.label = data.frame(LDA =fitted.label.lda, NB = fitted.label.nb, LR = fitted.label.lr, 
+                                    RF = fitted.label.rf, SVM = fitted.label.svm) 
+        
+        
+        
+        # This dataset for output directly as table per se
+        d.fitted.label.DT = cbind(Sample = 1:nrow(d.fitted.label), d.fitted.label)  %&gt;% as_tibble() 
+        
+        # This dataset for visualization by adding sample code (as ordered factor)
+        d.fitted.label = cbind(Sample = factor(1:nrow(d.fitted.label), ordered = T), d.fitted.label)  %&gt;% as_tibble()
+        
+        
+        # plotting will plot starting from the largest numbers first, weird, so now reverse the factor order
+        # change factor level order before tidying up, as after tidy up, each sample fator level is duplicated and the level order cannot be changed easiily then
+        d.fitted.label$Sample = d.fitted.label$Sample %&gt;% factor(levels = rev(d.fitted.label$Sample), ordered = T)
+        
+        
+        d.fitted.label.tidy = d.fitted.label %&gt;%
+            gather(-1, key = model, value = fitted.Model)
+        
+        
+        # VISUALIZE PREDICTED TYPE
+        theme.BatchPredict = theme_bw() + 
+            theme(legend.position = &quot;bottom&quot;, 
+                  
+                  legend.title = element_blank(),
+                  strip.background = element_blank(),
+                  
+                  panel.grid = element_blank(),
+                  panel.border = element_blank()
+            )
+        
+        
+        plt.fitted.model =  d.fitted.label.tidy %&gt;%
+            ggplot(aes(x = Sample, y = 0, color = fitted.Model)) + 
+            geom_segment(aes(xend = Sample, yend = 1), size = 2) + # line width user adjustable
+            scale_fill_manual(values = color.types) +  
+            theme.BatchPredict +
+            
+            # the fonts not included in the theme function, so to allow for UI adjustment
+            theme(strip.text = element_text(face = &quot;bold&quot;, size = 14),
+                  legend.text = element_text(size = 14),
+                  
+                  axis.title.y = element_text(size = 14, face = &quot;bold&quot;),
+                  axis.text.y = element_text(size = input$size.sampleCode),
+                  
+                  axis.text.x = element_blank(),
+                  axis.title.x = element_blank(),
+                  axis.ticks.x = element_blank()) +
+            
+            scale_x_discrete(breaks = seq(1, nrow(d.newSample.Batch.scaled() ), by = input$step.sampleCode)) + # by user adjustable
+            scale_color_manual(values = color.types) +
+            coord_flip() +
+            facet_wrap(~model, nrow = 1) +
+            labs(x = &quot;Sample codes \n&quot;)
+        
+        
+        
+        # PROBABILITY DISTRIBUTION 
+        # The probability dataset tidy up section is similar to that used for single sample prediction
+        # However with adaption, with additional control of the sample code as ordered factor
+        # Sample code in decreasing order of 1, 2, 3....# samples
+        func.tidyFittedProb = function(dataset, modelName){
+            dataset = dataset %&gt;% as_tibble() %&gt;% mutate(Sample = 1:nrow(dataset))
+            
+            # plot will start with the largest sample code number, weird, now reverse the order. 
+            # i.e., decreasing order in 1, 2, 3....
+            dataset$Sample = dataset$Sample %&gt;% factor(levels = rev(dataset$Sample), ordered = T)
+            
+            dataset = dataset %&gt;%          
+                gather(1:3, key = fitted.type, value = fitted.prob) %&gt;%
+                arrange(Sample) %&gt;% 
+                mutate(model = modelName)
+        }
+        
+        fitted.prob.lda = fitted.prob.lda %&gt;% func.tidyFittedProb(modelName = &quot;LDA&quot;)
+        fitted.prob.nb = fitted.prob.nb %&gt;% func.tidyFittedProb(modelName = &quot;NB&quot;)
+        fitted.prob.rf = fitted.prob.rf %&gt;% func.tidyFittedProb(modelName = &quot;RF&quot;)
+        fitted.prob.LR = fitted.prob.lr %&gt;% func.tidyFittedProb(modelName = &quot;LR&quot;)
+        
+        
+        fitted.prob =  rbind(fitted.prob.lda, fitted.prob.nb) %&gt;% rbind(fitted.prob.rf) %&gt;%
+            rbind(fitted.prob.LR)
+        
+        
+        plt.prob = fitted.prob %&gt;%
+            ggplot(aes(x = Sample, y = fitted.prob, fill = fitted.type)) +
+            geom_bar(stat = &quot;identity&quot;, position = &quot;stack&quot;) +
+            facet_wrap(~model, nrow = 1) + 
+            coord_flip() +
+            scale_fill_manual(values = color.types) +
+            
+            # When have small number of samples, may show the probability
+            # geom_text(aes(label = round(fitted.prob, 2)), position = position_stack(.5),
+            #           color = &quot;black&quot;, fontface = &quot;bold&quot;) +
+            
+            theme.BatchPredict +
+            # the fonts not included in the theme function, so to allow for UI adjustment
+            theme(strip.text = element_text(face = &quot;bold&quot;, size = 14),
+                  legend.text = element_text(size = 14),
+                  axis.title = element_text(size = 14, face = &quot;bold&quot;),
+                  axis.text = element_text(size = input$size.sampleCode)) +
+            
+            scale_x_discrete(breaks = seq(1, nrow(d.newSample.Batch.scaled() ), by = input$step.sampleCode)) + # &quot;by&quot; user adjustable
+            scale_y_continuous(breaks = seq(0, 1, by = .5)) +
+            
+            labs(y = &quot;\nPredicted probability&quot;, x = &quot;Sample codes\n&quot;)
+        
+        plt.prob  
+        
+        list(d.fitted.label.DT, plt.fitted.model, plt.prob) %&gt;% return()
+        
+    })
+    
+    output$batch.DT = renderDataTable( batchResults()[[1]] )
+    output$batch.plt.fitted.model = renderPlot( batchResults()[[2]]) # plt.fitted.model
+    output$batch.plt.prob = renderPlot(batchResults()[[3]]) # plt.prob
+    
+    # Render UI
+    output$ui.batch.plt.fitted.model = renderUI({
+        plotOutput(&quot;batch.plt.fitted.model&quot;, height = input$plotHeight, width = input$plotWidth)
+    })
+    
+    
+    output$ui.batch.plt.prob = renderUI({
+        plotOutput(&quot;batch.plt.prob&quot;, height = input$plotHeight, width = input$plotWidth)
+    })
+    
+    output$downloadPredict = downloadHandler(
+        filename = &quot;Predicted identity of lemon juices.xlsx&quot;,
+        content = function(file) {
+            write_xlsx(batchResults()[[1]], path = file)  
+        } 
+    )
     
 }
 

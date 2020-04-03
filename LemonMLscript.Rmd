@@ -60,7 +60,7 @@ names(color.types) = c("adulterated_L_J", "authentic_L_J", "lemonade")
 
 # Raw data tidy up
 ```{r, message=F, warning=F}
-path = "/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/Lemon paper data_B.Y.xlsx"
+path = "/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/publish ready files/Lemon paper data_B.Y.xlsx"
 d = read_excel(path, sheet = "March")
 d = d %>% filter(!code %in% c(63:66)) # No. 63-66 belongs to comemrcially sourced lemon juices
 
