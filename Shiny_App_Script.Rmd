@@ -38,7 +38,7 @@ drop_auth()
 token = drop_auth()
 saveRDS(token, file = "token.rds")
 
-d = drop_read_csv(file = "Shiny lemon final data_CLEANED UP.csv") 
+d = drop_read_csv(file = "Shiny lemon final data_CLEANED UP_new May.csv") 
 
 
 
@@ -243,7 +243,7 @@ ui <- fluidPage(
                                           min = 500, max = 1200, value = 825, step = 25) )
                 ),
                 
-            
+                
                 br(),br(),
                 # download predicted result table
                 downloadButton("downloadPredict", "Download predicted identity table",
@@ -290,7 +290,7 @@ ui <- fluidPage(
                          
                          p("This section makes prediction of the identity of multile samples over three possible outcomes:  authentic lemon juice (", strong("AULJ"), "), adulterated lemon juice (", strong("ADLJ"), "), and lemonade beverages (", strong("LMND"), "). Users are encouraged to tightly follow the format of the template. Ensure that the content value is numeric and that the column header is not changed before uploading the dataset to this application.", style = "color:black; font-size:105%;"),
                          
-                         p("The default presents the prediction result of the template data", em("per se,"), "which is also the dataset used to train the models. For user’s reference, original samples 1-26 are AULJ, 27-62 ADLJ, and 63-86 LMND.", style = "color:black; font-size:105%;"),  
+                         p("The default presents the prediction result of the template data", em("per se,"), "which is also the dataset used to train the models. For user’s reference, for samples numbered below, 1-26 are AULJ, 27-53 ADLJ, and 54-77 LMND. Both RF and SVM well learnt from the training samples and predicted all training samples correctly.", style = "color:black; font-size:105%;"),  
                          
                          br(),
                          
@@ -308,6 +308,7 @@ ui <- fluidPage(
                          strong("Table 1. Predicted identity of lemon juice products (result of Figure 1)", 
                                 style = "font-size:105%"),br(),br(),
                          DTOutput("batch.DT"),
+                         
                          br(),br(),br(),br(),br())
             )
         )
@@ -468,6 +469,7 @@ server <- function(input, output) {
     )
     
     
+    
     d.newSample.Batch.scaled = reactive({
         
         if (is.null(input$userfile)) { 
@@ -483,8 +485,8 @@ server <- function(input, output) {
             
             return(d.newSample.Batch.scaled)
             
+        }  else {
             
-        } else {
             # Read user-input excel file
             infile <- input$userfile
             d.newSample.Batch = read_excel(infile$datapath)
@@ -499,10 +501,9 @@ server <- function(input, output) {
                 scale(center = vector.mean, scale = vector.std) %>% as_tibble() # note that vector.mean/std in the global environment
             
             return(d.newSample.Batch.scaled)
-            
         }
-        
     })
+    
     
     batchResults = reactive({ 
         # PREDICT USING BUILT MODELS (FROM THE GLOBAL ENVIRONEMNT)
@@ -659,10 +660,11 @@ server <- function(input, output) {
         } 
     )
     
-}
+    }
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+
 
 ```
 
