@@ -408,7 +408,7 @@ library(randomForest)
 
 # finally load tidyverse avoiding key functions from being masked
 library(tidyverse)</code></pre>
-<pre class="r"><code>set.seed(2021)</code></pre>
+<pre class="r"><code>set.seed(2020)</code></pre>
 <pre class="r"><code>theme_set(theme_bw() +
             theme(strip.background = element_blank(),
                   strip.text = element_text(face = &quot;bold&quot;, size = 11),
@@ -524,8 +524,8 @@ plot_ly(PC, x = ~ PC1, y =  ~PC2, z =  ~PC3, color = ~ type) %&gt;%
            zaxis = list(title = paste0(&quot;PC3, &quot;, round(eigen.values[3]/sum(eigen.values)* 100, 1), &quot;% explained&quot;))
          )
   )</code></pre>
-<div id="htmlwidget-44474b3e8cd160f85a98" style="width:768px;height:768px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-44474b3e8cd160f85a98">{"x":{"visdat":{"10eff4756659c":["function () ","plotlyVisDat"]},"cur_data":"10eff4756659c","attrs":{"10eff4756659c":{"x":{},"y":{},"z":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Interactive PCA","scene":{"xaxis":{"title":"PC1, 38.1% explained"},"yaxis":{"title":"PC2, 13.4% explained"},"zaxis":{"title":"PC3, 9.9% explained"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[1.29245608021602,0.247327318026684,-2.56149506852184,1.02216854811322,1.02144854861423,0.221324174361603,-0.349045041869286,-0.38581323603689,-1.4821455186857,-2.37404641039611,-2.47684985252583,-3.72650845128052,0.153931476992609,-0.941729558563705,-1.50068529531973,-2.10972450438429,-2.64980884826357,2.13613894537144,-2.37418031730669,0.478180094023784,1.845971833046,-1.45374887861705,1.19418232583957,1.91430361040799,0.066834320382271,1.2127175590955,1.76579567376996],"y":[0.695526168184717,0.590944665242343,-4.1645585667584,1.13948649493847,1.04367370014434,1.38230502942391,-1.98630912501223,1.93770321135043,2.36212232905973,2.14999681352786,2.34829500113664,2.18440733827298,2.75578768016132,3.13716969340722,3.00971177877454,2.81693148679536,1.91489823211499,-1.06640858061311,-2.80357152637204,-0.748953948325587,-1.05436264362873,-2.33095577365992,0.00625489147679137,-0.325453367664005,-1.10722803571808,-0.0557751287201965,0.467505744789272],"z":[-0.153272397784193,-1.07588827668465,4.68854824204557,0.786203717659978,0.029601316090255,0.219153679839619,-3.60423289888726,1.2676637692362,0.708759504389941,1.53239208288905,1.28333869274744,0.31955812246784,1.06207167374108,0.748548555977624,0.877678989830995,1.23804936420199,0.0231827277148735,2.34709583631241,0.298763599570472,-0.868563972996611,1.19368249250316,0.431635919627839,0.141387674072584,1.72946532281876,0.424389806543768,-0.570694829818461,0.0592676898020226],"type":"scatter3d","mode":"markers","name":"adulterated_L_J","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[1.11105606348818,0.603039915546309,1.21353582832768,-1.35787019158325,0.19225080551594,-1.21246667581881,-1.45178082404376,-5.68026361836666,-3.16377269996762,-5.02990803003648,-4.96543833095703,-6.93055161425824,-3.2136386608419,-2.25524613183358,-1.90423074658712,-2.40873185573606,-4.16866825809589,-1.24964086402868,0.185187190398568,-2.99485684015602,0.111484893291767,-0.858635390662749,-1.54239194864953,2.07225720546971,1.83438570934901,1.77479111647483],"y":[-0.0859376154201105,-0.142252660854825,0.339587586095071,-0.152230195818979,0.345390365706661,0.260723038277785,-0.00618989387332358,-3.30564951725206,0.580460783900814,-0.00170437349004221,-2.46999529348503,0.183283634350539,-0.808450531398731,-0.558153587576732,-0.36941259219531,-1.77940596421968,-0.563238916320843,0.390317817157598,0.475794889065444,0.429704166707622,0.422730012901104,-0.0546266942913341,0.785547893407879,-0.920957728673648,-0.666756609984423,0.169127635494428],"z":[-0.817328459989141,-0.858211461675529,-0.629340350344767,-2.09800451069364,-1.18016988208466,-1.52645098158561,-1.4207164898772,-0.0830469642365655,-2.06787066093538,-1.90858964613215,-0.3866152999683,1.25046058688634,0.720261245486266,0.527260458222733,0.329804314863947,-0.544993314502189,0.557635333107548,-0.665821738241084,-0.782414382679238,-1.09934787994972,-0.993179712086061,-0.412911159184163,-0.747363795423164,2.28559867183411,1.56272953670896,0.0752991087137491],"type":"scatter3d","mode":"markers","name":"authentic_L_J","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[2.05714649351934,2.38757879319326,1.98706631927528,2.46898400690317,1.73913538312126,2.45951764380522,2.38254770319144,2.34711033045327,2.30378739310736,1.75433161273427,1.96369864134024,2.10522487111011,2.21860197339323,2.04435906039219,2.0544860415976,2.215836416796,2.68064964050441,2.25770659306511,1.49205524911911,1.67135779863506,1.90309179689125,2.3097740202158,1.98329764936216,2.31575899554558],"y":[0.423955238003994,0.00123198464260368,-0.700231723171998,0.556190798634687,-0.359181579935747,0.890399063146194,-0.108716821513531,0.395998235607263,0.463757866049253,-0.567813941502302,-0.870631862914607,-0.134451071866694,0.0869403450654771,-0.699917351924463,-0.0693727358762944,-0.0841103318097234,-1.84151340759914,0.334099918173264,-1.29982933293597,-1.17283776144364,-0.368996368680066,-0.588016740559321,-0.74470679201939,-0.339094836108358],"z":[-0.00271240614489784,-0.365869855855512,0.601645728672797,0.612065746738997,-0.35782594284662,0.883021326687573,-0.421366100870039,-0.225735328927382,-0.0744704279938564,-0.649403277140523,-0.977850240900579,-0.786210754766569,-0.226044698531477,-0.224402923208373,-0.615530933647594,-0.473465885341308,2.06979052487044,-0.17176827268735,-0.583666225719361,-1.24209006725691,-0.399331584083848,0.290684984898261,-0.249974151851627,-0.633948204241613],"type":"scatter3d","mode":"markers","name":"lemonade","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-2514ce28ae593bde0f73" style="width:768px;height:768px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2514ce28ae593bde0f73">{"x":{"visdat":{"10eff53bbda29":["function () ","plotlyVisDat"]},"cur_data":"10eff53bbda29","attrs":{"10eff53bbda29":{"x":{},"y":{},"z":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Interactive PCA","scene":{"xaxis":{"title":"PC1, 38.1% explained"},"yaxis":{"title":"PC2, 13.4% explained"},"zaxis":{"title":"PC3, 9.9% explained"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[1.29245608021602,0.247327318026684,-2.56149506852184,1.02216854811322,1.02144854861423,0.221324174361603,-0.349045041869286,-0.38581323603689,-1.4821455186857,-2.37404641039611,-2.47684985252583,-3.72650845128052,0.153931476992609,-0.941729558563705,-1.50068529531973,-2.10972450438429,-2.64980884826357,2.13613894537144,-2.37418031730669,0.478180094023784,1.845971833046,-1.45374887861705,1.19418232583957,1.91430361040799,0.066834320382271,1.2127175590955,1.76579567376996],"y":[0.695526168184717,0.590944665242343,-4.1645585667584,1.13948649493847,1.04367370014434,1.38230502942391,-1.98630912501223,1.93770321135043,2.36212232905973,2.14999681352786,2.34829500113664,2.18440733827298,2.75578768016132,3.13716969340722,3.00971177877454,2.81693148679536,1.91489823211499,-1.06640858061311,-2.80357152637204,-0.748953948325587,-1.05436264362873,-2.33095577365992,0.00625489147679137,-0.325453367664005,-1.10722803571808,-0.0557751287201965,0.467505744789272],"z":[-0.153272397784193,-1.07588827668465,4.68854824204557,0.786203717659978,0.029601316090255,0.219153679839619,-3.60423289888726,1.2676637692362,0.708759504389941,1.53239208288905,1.28333869274744,0.31955812246784,1.06207167374108,0.748548555977624,0.877678989830995,1.23804936420199,0.0231827277148735,2.34709583631241,0.298763599570472,-0.868563972996611,1.19368249250316,0.431635919627839,0.141387674072584,1.72946532281876,0.424389806543768,-0.570694829818461,0.0592676898020226],"type":"scatter3d","mode":"markers","name":"adulterated_L_J","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[1.11105606348818,0.603039915546309,1.21353582832768,-1.35787019158325,0.19225080551594,-1.21246667581881,-1.45178082404376,-5.68026361836666,-3.16377269996762,-5.02990803003648,-4.96543833095703,-6.93055161425824,-3.2136386608419,-2.25524613183358,-1.90423074658712,-2.40873185573606,-4.16866825809589,-1.24964086402868,0.185187190398568,-2.99485684015602,0.111484893291767,-0.858635390662749,-1.54239194864953,2.07225720546971,1.83438570934901,1.77479111647483],"y":[-0.0859376154201105,-0.142252660854825,0.339587586095071,-0.152230195818979,0.345390365706661,0.260723038277785,-0.00618989387332358,-3.30564951725206,0.580460783900814,-0.00170437349004221,-2.46999529348503,0.183283634350539,-0.808450531398731,-0.558153587576732,-0.36941259219531,-1.77940596421968,-0.563238916320843,0.390317817157598,0.475794889065444,0.429704166707622,0.422730012901104,-0.0546266942913341,0.785547893407879,-0.920957728673648,-0.666756609984423,0.169127635494428],"z":[-0.817328459989141,-0.858211461675529,-0.629340350344767,-2.09800451069364,-1.18016988208466,-1.52645098158561,-1.4207164898772,-0.0830469642365655,-2.06787066093538,-1.90858964613215,-0.3866152999683,1.25046058688634,0.720261245486266,0.527260458222733,0.329804314863947,-0.544993314502189,0.557635333107548,-0.665821738241084,-0.782414382679238,-1.09934787994972,-0.993179712086061,-0.412911159184163,-0.747363795423164,2.28559867183411,1.56272953670896,0.0752991087137491],"type":"scatter3d","mode":"markers","name":"authentic_L_J","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[2.05714649351934,2.38757879319326,1.98706631927528,2.46898400690317,1.73913538312126,2.45951764380522,2.38254770319144,2.34711033045327,2.30378739310736,1.75433161273427,1.96369864134024,2.10522487111011,2.21860197339323,2.04435906039219,2.0544860415976,2.215836416796,2.68064964050441,2.25770659306511,1.49205524911911,1.67135779863506,1.90309179689125,2.3097740202158,1.98329764936216,2.31575899554558],"y":[0.423955238003994,0.00123198464260368,-0.700231723171998,0.556190798634687,-0.359181579935747,0.890399063146194,-0.108716821513531,0.395998235607263,0.463757866049253,-0.567813941502302,-0.870631862914607,-0.134451071866694,0.0869403450654771,-0.699917351924463,-0.0693727358762944,-0.0841103318097234,-1.84151340759914,0.334099918173264,-1.29982933293597,-1.17283776144364,-0.368996368680066,-0.588016740559321,-0.74470679201939,-0.339094836108358],"z":[-0.00271240614489784,-0.365869855855512,0.601645728672797,0.612065746738997,-0.35782594284662,0.883021326687573,-0.421366100870039,-0.225735328927382,-0.0744704279938564,-0.649403277140523,-0.977850240900579,-0.786210754766569,-0.226044698531477,-0.224402923208373,-0.615530933647594,-0.473465885341308,2.06979052487044,-0.17176827268735,-0.583666225719361,-1.24209006725691,-0.399331584083848,0.290684984898261,-0.249974151851627,-0.633948204241613],"type":"scatter3d","mode":"markers","name":"lemonade","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="lda-full-data" class="section level2">
 <h2><span class="header-section-number">3.4</span> LDA (full data)</h2>
@@ -767,16 +767,16 @@ d.tune.svm.radial</code></pre>
 ## # Groups:   gamma [17]
 ##     gamma    cost accuracy.mean accuracy.sd
 ##     &lt;dbl&gt;   &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1 0.001    100            81.8        9.09
-##  2 0.0316    10            81.8       11.1 
-##  3 0.1       10            81.8        9.09
-##  4 0.1       31.6          81.8        9.09
-##  5 0.1      100            81.8        9.09
-##  6 0.1      316.           81.8        9.09
-##  7 0.1     1000            81.8        9.09
-##  8 0.1     3162.           81.8        9.09
-##  9 0.1    10000            81.8        9.09
-## 10 0.1    31623.           81.8        9.09
+##  1 0.1       3.16          80.0        17.5
+##  2 0.1       1             78.2        15.2
+##  3 0.0316   10             76.4        19.9
+##  4 0.1      10             76.4        18.9
+##  5 0.01     31.6           74.5        17.5
+##  6 0.0316   31.6           74.5        17.5
+##  7 0.1      31.6           74.5        17.5
+##  8 0.1     100             74.5        19.7
+##  9 0.1     316.            74.5        19.7
+## 10 0.1    1000             74.5        19.7
 ## # … with 245 more rows</code></pre>
 <pre class="r"><code># Func. def: plotting SVM hyper-parameter tuning result
 func.plot.tune.HyperParam = function( data, hyper1, hyper2){ 
@@ -827,16 +827,16 @@ d.tune.svm.polynomial</code></pre>
 ## # Groups:   degree [6]
 ##    degree     cost accuracy.mean accuracy.sd
 ##     &lt;int&gt;    &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1      3     10            80.0        14.9
-##  2      3     31.6          78.2        16.5
-##  3      3    316.           78.2        16.5
-##  4      3   1000            78.2        16.5
-##  5      3   3162.           78.2        16.5
-##  6      3  10000            78.2        16.5
-##  7      3  31623.           78.2        16.5
-##  8      3 100000            78.2        16.5
-##  9      5     31.6          78.2        10.4
-## 10      5    100            78.2        18.9
+##  1      3     10            74.5        11.9
+##  2      3     31.6          69.1        13.8
+##  3      3    100            69.1        10.4
+##  4      3    316.           69.1        10.4
+##  5      3   1000            69.1        10.4
+##  6      3   3162.           69.1        10.4
+##  7      3  10000            69.1        10.4
+##  8      3  31623.           69.1        10.4
+##  9      3 100000            69.1        10.4
+## 10      5    100            69.1        13.8
 ## # … with 80 more rows</code></pre>
 <pre class="r"><code># plot tune result of polynomial kernel
 plt.svm.tune.polynomial = 
@@ -869,21 +869,21 @@ d.tune.svm.linear</code></pre>
 <pre><code>## # A tibble: 15 x 3
 ##           cost accuracy.mean accuracy.sd
 ##          &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1      0.316           80.0        7.61
-##  2      1               76.4       13.8 
-##  3      3.16            76.4       10.4 
-##  4      0.1             72.7        6.43
-##  5     10               72.7        6.43
-##  6    316.              72.7       11.1 
-##  7   1000               72.7       11.1 
-##  8   3162.              72.7       11.1 
-##  9  10000               72.7       11.1 
-## 10  31623.              72.7       11.1 
-## 11 100000               72.7       11.1 
-## 12     31.6             70.9        9.96
-## 13    100               70.9        9.96
-## 14      0.0316          69.1        4.98
-## 15      0.01            41.8       13.8</code></pre>
+##  1      0.316           63.6        18.2
+##  2      1               63.6        20.3
+##  3      3.16            63.6        20.3
+##  4      0.1             61.8        14.9
+##  5     10               56.4        17.5
+##  6     31.6             56.4        17.5
+##  7    100               56.4        17.5
+##  8    316.              56.4        19.7
+##  9      0.0316          54.5        17.0
+## 10   1000               54.5        20.3
+## 11   3162.              50.9        23.7
+## 12  10000               50.9        23.7
+## 13  31623.              50.9        23.7
+## 14 100000               50.9        23.7
+## 15      0.01            41.8        19.9</code></pre>
 <pre class="r"><code>d.tune.svm.linear %&gt;% ggplot(aes(x = cost, y = accuracy.mean)) + 
   geom_bar(stat = &quot;identity&quot;, alpha = .8) + geom_point() + geom_line() + 
   scale_x_log10() </code></pre>
@@ -896,9 +896,9 @@ rbind(k1, k2, k3)</code></pre>
 <pre><code>## # A tibble: 3 x 3
 ##   accuracy.mean accuracy.sd kernel    
 ##           &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;     
-## 1          81.8        9.09 radial    
-## 2          80.0       14.9  polynomial
-## 3          80.0        7.61 linear</code></pre>
+## 1          80.0        17.5 radial    
+## 2          74.5        11.9 polynomial
+## 3          63.6        18.2 linear</code></pre>
 <pre class="r"><code>cv.svm = k1 %&gt;% mutate(model = &quot;SVM&quot;)</code></pre>
 </div>
 </div>
@@ -910,10 +910,10 @@ rbind(k1, k2, k3)</code></pre>
 
 accuracy.training.svm = sum(predict(mdl.svm) == trainingSet.scaled$type) / nrow(trainingSet.scaled)*100
 cat(&quot;Accuracy on the training set is&quot;, accuracy.training.svm, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the training set is 89.09091 %.</code></pre>
+<pre><code>## Accuracy on the training set is 96.36364 %.</code></pre>
 <pre class="r"><code>accuracy.testing.svm = sum(predict(mdl.svm, newdata = testingSet.scaled) == testingSet.scaled$type) / nrow(testingSet.scaled) *100
 cat(&quot;Accuracy on the testing set is&quot;, accuracy.testing.svm, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the testing set is 63.63636 %.</code></pre>
+<pre><code>## Accuracy on the testing set is 81.81818 %.</code></pre>
 <pre class="r"><code># confusion matrix
 predict.SVM = predict(mdl.svm, newdata = testingSet.scaled)
 
@@ -949,7 +949,7 @@ mdl.lda = lda(data = trainingSet.scaled, type ~., prior = rep(1/3, 3))
 # Prediction on the training set
 accuracy.training.LDA = sum(predict(mdl.lda)$class == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
 cat(&quot;Accuracy on the training set by Linear Discriminant Analysis is&quot;, accuracy.training.LDA, &quot;%.&quot; )</code></pre>
-<pre><code>## Accuracy on the training set by Linear Discriminant Analysis is 87.27273 %.</code></pre>
+<pre><code>## Accuracy on the training set by Linear Discriminant Analysis is 83.63636 %.</code></pre>
 <pre class="r"><code># Prediction on the testing set 
 fitted.lda = predict(mdl.lda, newdata = testingSet.scaled)
 predict.LDA = fitted.lda$class
@@ -959,7 +959,7 @@ cf.lda = table(predict.LDA, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.lda = sum(predict(mdl.lda, newdata = testingSet.scaled)$class == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the testing set by Linear Discriminant Analysis is&quot;, accuracy.testing.lda, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the testing set by Linear Discriminant Analysis is 59.09091 %.</code></pre>
+<pre><code>## Accuracy on the testing set by Linear Discriminant Analysis is 81.81818 %.</code></pre>
 <pre class="r"><code># probability distribution sample-wise
 d.prob.lda = fitted.lda$posterior %&gt;% as_tibble() %&gt;% mutate(model = &quot;LDA&quot;)</code></pre>
 </div>
@@ -997,16 +997,16 @@ d.tune.RF</code></pre>
 ## # Groups:   trees [10]
 ##    trees features accuracy.mean accuracy.sd
 ##    &lt;dbl&gt;    &lt;int&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-##  1   100        3          81.8        6.43
-##  2   100        4          81.8        6.43
-##  3   200        6          81.8        6.43
-##  4   400        5          81.8        6.43
-##  5   400        6          81.8        6.43
-##  6   500        5          81.8        6.43
-##  7   500        6          81.8        6.43
-##  8   600        3          81.8        6.43
-##  9   600        5          81.8        6.43
-## 10   600        6          81.8        6.43
+##  1   400        3          78.2       10.4 
+##  2   500        2          78.2       10.4 
+##  3   500        5          78.2       10.4 
+##  4   700        2          78.2       10.4 
+##  5  1000        2          78.2       10.4 
+##  6   100        2          76.4       12.2 
+##  7   100        3          76.4        8.13
+##  8   100        4          76.4       12.2 
+##  9   200        2          76.4        8.13
+## 10   200        5          76.4        8.13
 ## # … with 60 more rows</code></pre>
 <pre class="r"><code>plt.RF.tune = d.tune.RF %&gt;% 
   func.plot.tune.HyperParam(hyper1 = &quot;trees&quot;, hyper2 = &quot;features&quot;) +
@@ -1036,7 +1036,7 @@ cf.RF = table(predict.RF, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.RF = sum(predict.RF == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the testing set using Random Forest is&quot;, accuracy.testing.RF, &quot;%&quot;) </code></pre>
-<pre><code>## Accuracy on the testing set using Random Forest is 81.81818 %</code></pre>
+<pre><code>## Accuracy on the testing set using Random Forest is 90.90909 %</code></pre>
 <pre class="r"><code># Probability distribution of predicted test set
 d.prob.RF = predict(mdl.rf, testingSet.scaled, type = &quot;prob&quot;) %&gt;%
   as_tibble() %&gt;%
@@ -1074,7 +1074,7 @@ cf.NB = table(predict.NB, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.NB = sum(predict.NB == testingSet.scaled$type)/nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the testing set using Naive Bayes is&quot;, accuracy.testing.NB, &quot;%.&quot;)</code></pre>
-<pre><code>## Accuracy on the testing set using Naive Bayes is 77.27273 %.</code></pre>
+<pre><code>## Accuracy on the testing set using Naive Bayes is 81.81818 %.</code></pre>
 <pre class="r"><code>d.prob.NB = predict(mdl.nb, testingSet.scaled[, -1], type = &quot;raw&quot;)  %&gt;%
   as_tibble() %&gt;% mutate(model = &quot;NB&quot;)
 # d.prob.NB</code></pre>
@@ -1112,7 +1112,7 @@ fitted.softmax.train = predict(softmax.cv, newx = trainingSet.scaled[, -1] %&gt;
 
 accuracy.training.LR = sum(fitted.softmax.train == trainingSet.scaled$type) / nrow(trainingSet.scaled) * 100
 cat(&quot;Accuracy on the training set using lasso-regularized softmax regression is&quot;, accuracy.training.LR, &quot;%.&quot;) </code></pre>
-<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 74.54545 %.</code></pre>
+<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 56.36364 %.</code></pre>
 <pre class="r"><code># Prediction on the testing set
 predict.softmax = predict(softmax.cv, newx = testingSet.scaled[, -1] %&gt;% as.matrix(),
                           s = softmax.cv$lambda.1se, type = &quot;class&quot;) %&gt;% c()
@@ -1122,13 +1122,12 @@ cf.LR = table(predict.softmax, testingSet.scaled$type) %&gt;%
 
 accuracy.testing.LR = sum(predict.softmax == testingSet.scaled$type) / nrow(testingSet.scaled) * 100
 cat(&quot;Accuracy on the training set using lasso-regularized softmax regression is&quot;, accuracy.testing.LR, &quot;%.&quot;) </code></pre>
-<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 63.63636 %.</code></pre>
+<pre><code>## Accuracy on the training set using lasso-regularized softmax regression is 68.18182 %.</code></pre>
 <pre class="r"><code>table(predict.softmax, testingSet.scaled$type)</code></pre>
 <pre><code>##                  
 ## predict.softmax   adulterated_L_J authentic_L_J lemonade
-##   adulterated_L_J               3             1        0
-##   authentic_L_J                 2             4        0
-##   lemonade                      3             2        7</code></pre>
+##   adulterated_L_J               8             4        0
+##   lemonade                      0             3        7</code></pre>
 <pre class="r"><code># Predicted probability distribution on the test set
 d.prob.LR = predict(softmax.cv, newx = testingSet.scaled[, -1] %&gt;% as.matrix(),
                     s = softmax.cv$lambda.1se, type = &quot;response&quot;) %&gt;%
