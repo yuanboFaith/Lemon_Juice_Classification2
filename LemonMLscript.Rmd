@@ -60,9 +60,9 @@ names(color.types) = c("adulterated_L_J", "authentic_L_J", "lemonade")
 
 # Raw data tidy up
 ```{r, message=F, warning=F}
-path = "/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/publish ready files/Lemon paper data_B.Y.xlsx"
-d = read_excel(path, sheet = "March")
-d = d %>% filter(!code %in% c(63:66)) # No. 63-66 belongs to comemrcially sourced lemon juices
+path = "/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/publish ready files/June 2020/Supplementary Material-June-C.xlsx"
+d = read_excel(path, sheet = "Final data", range = "A1:R82")
+d = d %>% filter(!code %in% c(54:57)) # No. 54-57 belongs to comemrcially sourced lemon juices
 
 
 # Replace special values
@@ -485,7 +485,6 @@ k2 = d.tune.svm.polynomial[1, 3:4] %>% mutate(kernel = "polynomial") # best degr
 k3 = d.tune.svm.linear[1, 2:3]  %>% mutate(kernel = "linear") 
 
 rbind(k1, k2, k3)
-# radial kernel renders the best cross-validation result up to 90.4 (sd 6.08) % overal accuracy, with hyper-parameter gamma 0.1 and cost 10. Linear kernel gives 82.1% accuracy. Polynomial with optimal degree 3 achieved 82.4% accuracy. Both linear and polynomial kernel generated much higher validation standard deviation.
 
 cv.svm = k1 %>% mutate(model = "SVM")
 ```

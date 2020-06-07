@@ -52,9 +52,9 @@ names(color.types) = c("adulterated_L_J", "authentic_L_J", "lemonade")
 
 ```{r, message=F, warning=F, results='hide', echo=F}
 # Raw data tidy up
-path = "/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/publish ready files/Lemon paper data_B.Y.xlsx"
-d = read_excel(path, sheet = "March")
-d = d %>% filter(!code %in% c(63:66)) # No. 63-66 belongs to comemrcially sourced lemon juices
+path = "/Users/Boyuan/Desktop/My publication/14. Lemon juice (Weiting)/publish ready files/June 2020/Supplementary Material-June-C.xlsx"
+d = read_excel(path, sheet = "Final data", range = "A1:R82")
+d = d %>% filter(!code %in% c(54:57)) # No. 54-57 belongs to comemrcially sourced lemon juices
 
 # Replace special values
 vectorReplace = function(x, searchPattern){
