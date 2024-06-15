@@ -1,4 +1,4 @@
-### Assessment of lemon juice quality and adulteration by ultra-high performance liquid chromatography/triple quadrupole mass spectrometry with interactive and interpretable machine learning
+## Assessment of lemon juice quality and adulteration by ultra-high performance liquid chromatography/triple quadrupole mass spectrometry with interactive and interpretable machine learning
 
 Check the **[original article](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9261826/)** published in _Journal of Food and Drug Analysis_. 
 
