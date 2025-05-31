@@ -4,10 +4,10 @@ navbar:
   left:
     - text: "Home"
       href: index.html
-    - text: "ICE plots"
-      href: ICEplots.html
     - text: "Machine Learning Script"
       href: LemonMLscript.html
+    - text: "ICE plots"
+      href: ICEplots.html
     - text: "Shiny App Script"
       href: Shiny_App_Script.html
 output_dir: "."
